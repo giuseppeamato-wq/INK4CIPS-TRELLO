@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1785239559920,
+      "tag": "0000_wide_landau",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1785241010037,
+      "tag": "0001_orange_warstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785251681954,
+      "tag": "0002_left_silhouette",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1785253513424,
+      "tag": "0003_next_pretty_boy",
+      "breakpoints": true
+    }
+  ]
+}

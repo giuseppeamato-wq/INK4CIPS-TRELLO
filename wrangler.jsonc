@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ink4cips-trello",
+  "main": "./custom-worker.ts",
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ink4cips-trello-db",
+      "database_id": "local-placeholder-until-first-deploy",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ATTACHMENTS",
+      "bucket_name": "ink4cips-trello-attachments"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "BOARD_ROOM", "class_name": "BoardRoom" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["BoardRoom"] }
+  ]
+}
