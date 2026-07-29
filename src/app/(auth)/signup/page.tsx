@@ -68,7 +68,7 @@ export default function SignupPage() {
         <img src="/logo.png" alt="INK4CIPS" className="mx-auto mb-2 size-16 rounded-xl" />
         <CardTitle>Crea il tuo account</CardTitle>
         <CardDescription>
-          Inizia a gestire i tuoi progetti con INK4CIPS-TRELLO.
+          Inizia a gestire i tuoi progetti con INK4CIPS.
         </CardDescription>
       </CardHeader>
       <Form {...form}>

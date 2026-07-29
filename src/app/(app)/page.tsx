@@ -16,7 +16,7 @@ export default async function AppHomePage() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-16 text-center">
       <h1 className="font-heading text-xl font-semibold">
-        Benvenuto in INK4CIPS-TRELLO
+        Benvenuto in INK4CIPS
       </h1>
       <p className="text-muted-foreground">
         Non fai ancora parte di nessun workspace. Creane uno per iniziare a

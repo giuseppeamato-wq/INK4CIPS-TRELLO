@@ -22,7 +22,7 @@ export default async function AppLayout({
     <div className="flex min-h-svh flex-col">
       <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
         <span className="truncate font-heading text-sm font-semibold">
-          INK4CIPS-TRELLO
+          INK4CIPS
         </span>
         <div className="flex items-center gap-3">
           <span className="hidden truncate text-sm text-muted-foreground sm:inline">

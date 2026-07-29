@@ -25,7 +25,7 @@ export function WorkspaceSidebar({
     <>
       <Link href="/" className="flex items-center gap-2 px-2">
         <img src="/logo.png" alt="INK4CIPS" className="size-7 rounded-md" />
-        <span className="truncate font-heading text-sm font-semibold">INK4CIPS-TRELLO</span>
+        <span className="truncate font-heading text-sm font-semibold">INK4CIPS</span>
       </Link>
 
       <div className="flex flex-col gap-1">

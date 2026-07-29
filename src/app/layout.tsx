@@ -20,7 +20,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "INK4CIPS-TRELLO",
+  title: "INK4CIPS",
   description: "Gestione multi-progetto in team per INK4CIPS",
   manifest: "/manifest.webmanifest",
   icons: {
