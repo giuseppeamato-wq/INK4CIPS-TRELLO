@@ -60,6 +60,7 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader>
+        <img src="/logo.png" alt="INK4CIPS" className="mx-auto mb-2 size-16 rounded-xl" />
         <CardTitle>Accedi a INK4CIPS-TRELLO</CardTitle>
         <CardDescription>
           Inserisci le tue credenziali per accedere ai tuoi progetti.
