@@ -229,7 +229,9 @@ export function BoardCanvas({
               list={list}
               cards={cardsByList.get(list.id) ?? []}
               canEdit={canEdit}
-              onCardCreated={(card) => setCards((prev) => [...prev, card])}
+              onCardCreated={(card) =>
+                setCards((prev) => (prev.some((c) => c.id === card.id) ? prev : [...prev, card]))
+              }
               onCardOpen={openCard}
               onRenamed={(listId, name) =>
                 setLists((prev) => prev.map((l) => (l.id === listId ? { ...l, name } : l)))
@@ -244,7 +246,9 @@ export function BoardCanvas({
         <CreateListForm
           boardId={boardId}
           lastSortKey={sortedLists.length ? sortedLists[sortedLists.length - 1].sortKey : null}
-          onCreated={(list) => setLists((prev) => [...prev, list])}
+          onCreated={(list) =>
+            setLists((prev) => (prev.some((l) => l.id === list.id) ? prev : [...prev, list]))
+          }
         />
       </div>
       <DragOverlay>
