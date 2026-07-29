@@ -16,7 +16,17 @@ import {
 import { createLabelAction, toggleCardLabelAction } from "@/lib/actions/card-detail"
 import type { CardLabelT } from "./types"
 
-const PALETTE = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#64748b"]
+const PALETTE = ["#61bd4f", "#f2d600", "#ff9f1a", "#eb5a46", "#c377e0", "#0079bf", "#00c2e0", "#51e898"]
+
+// Relative-luminance check so label text stays readable against any swatch
+// (e.g. the yellow/lime picks in this palette need dark text, not white).
+function textColorFor(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.6 ? "#111111" : "#ffffff"
+}
 
 export function CardLabelsPopover({
   cardId,
@@ -69,7 +79,7 @@ export function CardLabelsPopover({
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {labels.map((l) => (
-        <Badge key={l.id} style={{ backgroundColor: l.color, color: "white" }}>
+        <Badge key={l.id} style={{ backgroundColor: l.color, color: textColorFor(l.color) }}>
           {l.name || " "}
         </Badge>
       ))}
@@ -96,7 +106,9 @@ export function CardLabelsPopover({
                   className="h-5 flex-1 rounded"
                   style={{ backgroundColor: l.color }}
                 >
-                  <span className="px-2 text-xs text-white">{l.name}</span>
+                  <span className="px-2 text-xs" style={{ color: textColorFor(l.color) }}>
+                    {l.name}
+                  </span>
                 </span>
                 {labels.some((cl) => cl.id === l.id) && <span className="text-xs">✓</span>}
               </button>

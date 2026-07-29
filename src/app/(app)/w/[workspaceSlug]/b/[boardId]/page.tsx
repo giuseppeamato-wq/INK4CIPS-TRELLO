@@ -5,6 +5,7 @@ import { getBoardById } from "@/lib/queries/boards"
 import { getBoardContents } from "@/lib/queries/board-contents"
 import { getMyRoleInWorkspace } from "@/lib/queries/workspaces"
 import { BoardCanvas } from "@/components/board/board-canvas"
+import { BoardBackgroundPicker } from "@/components/board/board-background-picker"
 
 export default async function BoardPage({
   params,
@@ -26,9 +27,18 @@ export default async function BoardPage({
 
   return (
     <div className="flex h-full flex-col">
-      <h1 className="font-heading px-6 pt-6 text-lg font-semibold">{board.name}</h1>
+      <div className="flex items-center gap-2 px-6 pt-6">
+        <h1 className="font-heading text-lg font-semibold">{board.name}</h1>
+        {canEdit && <BoardBackgroundPicker boardId={boardId} current={board.background} />}
+      </div>
       <Suspense fallback={null}>
-        <BoardCanvas boardId={boardId} initialLists={lists} initialCards={cards} canEdit={canEdit} />
+        <BoardCanvas
+          boardId={boardId}
+          initialLists={lists}
+          initialCards={cards}
+          canEdit={canEdit}
+          background={board.background}
+        />
       </Suspense>
     </div>
   )

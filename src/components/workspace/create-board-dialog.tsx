@@ -8,6 +8,8 @@ import { z } from "zod"
 import { toast } from "sonner"
 
 import { createBoardAction } from "@/lib/actions/boards"
+import { BOARD_BACKGROUNDS, DEFAULT_BOARD_BACKGROUND_ID } from "@/lib/board-backgrounds"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -29,6 +31,7 @@ import {
 
 const schema = z.object({
   name: z.string().min(1, "Inserisci un nome").max(80),
+  background: z.string(),
 })
 
 export function CreateBoardDialog({ workspaceId }: { workspaceId: string }) {
@@ -38,13 +41,13 @@ export function CreateBoardDialog({ workspaceId }: { workspaceId: string }) {
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "" },
+    defaultValues: { name: "", background: DEFAULT_BOARD_BACKGROUND_ID },
   })
 
   async function onSubmit(values: z.infer<typeof schema>) {
     setIsSubmitting(true)
     try {
-      await createBoardAction(workspaceId, values.name)
+      await createBoardAction(workspaceId, values.name, values.background)
       setOpen(false)
       form.reset()
       router.refresh()
@@ -72,6 +75,33 @@ export function CreateBoardDialog({ workspaceId }: { workspaceId: string }) {
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input placeholder="Es. Sprint Luglio" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="background"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sfondo</FormLabel>
+                  <FormControl>
+                    <div className="flex flex-wrap gap-2">
+                      {BOARD_BACKGROUNDS.map((bg) => (
+                        <button
+                          key={bg.id}
+                          type="button"
+                          aria-label={bg.label}
+                          onClick={() => field.onChange(bg.id)}
+                          className={cn(
+                            "size-8 rounded-full ring-2 ring-offset-2 ring-offset-background transition-shadow",
+                            bg.className,
+                            field.value === bg.id ? "ring-foreground" : "ring-transparent"
+                          )}
+                        />
+                      ))}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

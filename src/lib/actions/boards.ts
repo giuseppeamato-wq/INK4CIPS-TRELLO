@@ -5,15 +5,16 @@ import { getDb } from "@/db"
 import { boards } from "@/db/schema"
 import { requireSession } from "@/lib/auth/session"
 import { requireBoardEditor, requireWorkspaceMember } from "@/lib/authz/guards"
+import { DEFAULT_BOARD_BACKGROUND_ID } from "@/lib/board-backgrounds"
 
-export async function createBoardAction(workspaceId: string, name: string) {
+export async function createBoardAction(workspaceId: string, name: string, background: string) {
   const session = await requireSession()
   await requireWorkspaceMember(workspaceId, session.user.id)
 
   const db = getDb()
   const [board] = await db
     .insert(boards)
-    .values({ workspaceId, name, createdBy: session.user.id })
+    .values({ workspaceId, name, background: background || DEFAULT_BOARD_BACKGROUND_ID, createdBy: session.user.id })
     .returning({ id: boards.id, name: boards.name })
 
   return board
@@ -25,6 +26,14 @@ export async function renameBoardAction(boardId: string, name: string) {
 
   const db = getDb()
   await db.update(boards).set({ name }).where(eq(boards.id, boardId))
+}
+
+export async function updateBoardBackgroundAction(boardId: string, backgroundId: string) {
+  const session = await requireSession()
+  await requireBoardEditor(boardId, session.user.id)
+
+  const db = getDb()
+  await db.update(boards).set({ background: backgroundId }).where(eq(boards.id, boardId))
 }
 
 export async function deleteBoardAction(boardId: string) {

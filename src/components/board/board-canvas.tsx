@@ -19,6 +19,8 @@ import { moveListAction } from "@/lib/actions/lists"
 import { moveCardAction } from "@/lib/actions/cards"
 import { keyBetween } from "@/lib/ordering/position"
 import { useBoardRealtime } from "@/lib/realtime/use-board-realtime"
+import { getBoardBackground } from "@/lib/board-backgrounds"
+import { cn } from "@/lib/utils"
 import { ListColumn, type ListT } from "./list-column"
 import { CardItem, type CardT } from "./card-item"
 import { CreateListForm } from "./create-list-form"
@@ -29,11 +31,13 @@ export function BoardCanvas({
   initialLists,
   initialCards,
   canEdit,
+  background,
 }: {
   boardId: string
   initialLists: ListT[]
   initialCards: CardT[]
   canEdit: boolean
+  background?: string | null
 }) {
   const [lists, setLists] = useState(initialLists)
   const [cards, setCards] = useState(initialCards)
@@ -75,6 +79,7 @@ export function BoardCanvas({
                 {
                   ...event.card,
                   dueDate: event.card.dueDate ? new Date(event.card.dueDate) : null,
+                  labels: [],
                 },
               ]
         )
@@ -216,7 +221,7 @@ export function BoardCanvas({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-full gap-3 overflow-x-auto p-6">
+      <div className={cn("flex h-full gap-3 overflow-x-auto p-6", getBoardBackground(background).className)}>
         <SortableContext items={sortedLists.map((l) => l.id)} strategy={horizontalListSortingStrategy}>
           {sortedLists.map((list) => (
             <ListColumn
@@ -245,7 +250,7 @@ export function BoardCanvas({
       <DragOverlay>
         {activeCard ? <CardItem card={activeCard} /> : null}
         {activeList ? (
-          <div className="w-72 rounded-lg bg-muted/80 p-2.5 text-sm font-medium shadow-lg">
+          <div className="w-72 rounded-xl bg-card/90 p-2.5 text-sm font-medium shadow-lg shadow-black/20 backdrop-blur-sm">
             {activeList.name}
           </div>
         ) : null}

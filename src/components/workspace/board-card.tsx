@@ -16,13 +16,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { renameBoardAction, deleteBoardAction } from "@/lib/actions/boards"
+import { getBoardBackground } from "@/lib/board-backgrounds"
+import { cn } from "@/lib/utils"
 
 export function BoardCard({
   board,
   workspaceSlug,
   canEdit,
 }: {
-  board: { id: string; name: string }
+  board: { id: string; name: string; background: string | null }
   workspaceSlug: string
   canEdit: boolean
 }) {
@@ -68,7 +70,8 @@ export function BoardCard({
     <>
       <div className="relative">
         <Link href={`/w/${workspaceSlug}/b/${board.id}`}>
-          <Card className="h-24 justify-center transition-colors hover:bg-muted/50">
+          <Card className="h-24 justify-center overflow-hidden transition-colors hover:bg-muted/50">
+            <div className={cn("h-8", getBoardBackground(board.background).className)} />
             <CardHeader>
               <CardTitle className="pr-6 text-sm">{board.name}</CardTitle>
             </CardHeader>

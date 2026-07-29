@@ -32,7 +32,7 @@ export function CreateCardForm({
     try {
       const sortKey = keyBetween(lastSortKey, null)
       const card = await createCardAction(listId, trimmed, sortKey)
-      onCreated({ ...card, dueDate: null })
+      onCreated({ ...card, dueDate: null, labels: [] })
       setTitle("")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore imprevisto")

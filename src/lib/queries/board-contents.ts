@@ -1,13 +1,13 @@
 import { and, asc, eq } from "drizzle-orm"
 import { getDb } from "@/db"
-import { cards, lists } from "@/db/schema"
+import { cardLabels, cards, labels, lists } from "@/db/schema"
 import { requireBoardMember } from "@/lib/authz/guards"
 
 export async function getBoardContents(boardId: string, requestingUserId: string) {
   await requireBoardMember(boardId, requestingUserId)
   const db = getDb()
 
-  const [listRows, cardRows] = await Promise.all([
+  const [listRows, cardRows, labelRows] = await Promise.all([
     db
       .select({ id: lists.id, name: lists.name, sortKey: lists.sortKey })
       .from(lists)
@@ -24,7 +24,23 @@ export async function getBoardContents(boardId: string, requestingUserId: string
       .from(cards)
       .where(and(eq(cards.boardId, boardId), eq(cards.archived, false)))
       .orderBy(asc(cards.sortKey)),
+    db
+      .select({ cardId: cardLabels.cardId, id: labels.id, color: labels.color })
+      .from(cardLabels)
+      .innerJoin(cards, eq(cardLabels.cardId, cards.id))
+      .innerJoin(labels, eq(cardLabels.labelId, labels.id))
+      .where(and(eq(cards.boardId, boardId), eq(cards.archived, false))),
   ])
 
-  return { lists: listRows, cards: cardRows }
+  const labelsByCard = new Map<string, { id: string; color: string }[]>()
+  for (const row of labelRows) {
+    const list = labelsByCard.get(row.cardId) ?? []
+    list.push({ id: row.id, color: row.color })
+    labelsByCard.set(row.cardId, list)
+  }
+
+  return {
+    lists: listRows,
+    cards: cardRows.map((c) => ({ ...c, labels: labelsByCard.get(c.id) ?? [] })),
+  }
 }

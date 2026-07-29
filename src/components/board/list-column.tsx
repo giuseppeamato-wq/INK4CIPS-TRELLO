@@ -93,7 +93,7 @@ export function ListColumn({
       ref={setSortableRef}
       style={style}
       className={cn(
-        "flex w-72 shrink-0 flex-col gap-2 rounded-lg bg-muted/50 p-2.5",
+        "flex w-72 shrink-0 flex-col gap-2 rounded-xl bg-card/90 p-2.5 shadow-md shadow-black/20 backdrop-blur-sm",
         isDragging && "opacity-40"
       )}
     >
