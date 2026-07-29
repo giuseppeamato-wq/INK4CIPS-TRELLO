@@ -8,6 +8,7 @@ import {
 } from "@/lib/queries/workspaces"
 import { InviteMemberDialog } from "@/components/workspace/invite-member-dialog"
 import { MemberRoleSelect } from "@/components/workspace/member-role-select"
+import { WorkspaceDriveUrlField } from "@/components/workspace/workspace-drive-url-field"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
@@ -39,6 +40,16 @@ export default async function WorkspaceSettingsPage({
         </h1>
         {canManage && <InviteMemberDialog workspaceId={workspace.id} />}
       </div>
+
+      {canManage && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-muted-foreground">Google Drive</h2>
+          <p className="text-xs text-muted-foreground">
+            Link alla cartella Drive di questo workspace — comparirà come icona accanto al nome nella sidebar.
+          </p>
+          <WorkspaceDriveUrlField workspaceId={workspace.id} driveUrl={workspace.driveUrl} />
+        </section>
+      )}
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-medium text-muted-foreground">Membri</h2>

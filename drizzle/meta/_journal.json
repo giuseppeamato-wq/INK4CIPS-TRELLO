@@ -29,6 +29,13 @@
       "when": 1785253513424,
       "tag": "0003_next_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1785341481196,
+      "tag": "0004_mute_talos",
+      "breakpoints": true
     }
   ]
 }

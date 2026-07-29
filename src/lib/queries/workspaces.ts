@@ -13,7 +13,13 @@ export async function getUserWorkspaces(userId: string) {
   if (!memberships.length) return []
 
   const rows = await db
-    .select({ id: workspaces.id, name: workspaces.name, slug: workspaces.slug, createdAt: workspaces.createdAt })
+    .select({
+      id: workspaces.id,
+      name: workspaces.name,
+      slug: workspaces.slug,
+      driveUrl: workspaces.driveUrl,
+      createdAt: workspaces.createdAt,
+    })
     .from(workspaces)
     .where(
       inArray(
@@ -31,7 +37,13 @@ export async function getUserWorkspaces(userId: string) {
 export async function getWorkspaceBySlug(slug: string, userId: string) {
   const db = getDb()
   const [workspace] = await db
-    .select({ id: workspaces.id, name: workspaces.name, slug: workspaces.slug, createdBy: workspaces.createdBy })
+    .select({
+      id: workspaces.id,
+      name: workspaces.name,
+      slug: workspaces.slug,
+      driveUrl: workspaces.driveUrl,
+      createdBy: workspaces.createdBy,
+    })
     .from(workspaces)
     .where(eq(workspaces.slug, slug))
 

@@ -57,6 +57,7 @@ export const workspaces = sqliteTable("workspaces", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  driveUrl: text("drive_url"),
   createdBy: text("created_by").notNull().references(() => user.id),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 })

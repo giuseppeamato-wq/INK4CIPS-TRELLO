@@ -63,3 +63,14 @@ export async function updateMemberRoleAction(
     .set({ role })
     .where(and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, targetUserId)))
 }
+
+export async function updateWorkspaceDriveUrlAction(workspaceId: string, driveUrl: string) {
+  const session = await requireSession()
+  await requireWorkspaceAdmin(workspaceId, session.user.id)
+
+  const db = getDb()
+  await db
+    .update(workspaces)
+    .set({ driveUrl: driveUrl || null })
+    .where(eq(workspaces.id, workspaceId))
+}

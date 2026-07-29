@@ -8,7 +8,17 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
 
-type WorkspaceSummary = { id: string; name: string; slug: string; role: string }
+type WorkspaceSummary = { id: string; name: string; slug: string; role: string; driveUrl: string | null }
+
+function GoogleDriveIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <polygon points="8.5,3 15.5,3 22,14.5 15,14.5" fill="#FFC107" />
+      <polygon points="2,14.5 8.5,3 15,14.5 8.5,21.5" fill="#4285F4" />
+      <polygon points="8.5,21.5 15,14.5 22,14.5 15.5,21.5" fill="#34A853" />
+    </svg>
+  )
+}
 
 export function WorkspaceSidebar({
   workspaces,
@@ -33,16 +43,28 @@ export function WorkspaceSidebar({
           Workspace
         </span>
         {workspaces.map((w) => (
-          <Link
-            key={w.id}
-            href={`/w/${w.slug}`}
-            className={cn(
-              "truncate rounded-md px-2 py-1.5 text-sm hover:bg-muted",
-              w.slug === currentSlug && "bg-muted font-medium"
+          <div key={w.id} className="flex items-center gap-1">
+            <Link
+              href={`/w/${w.slug}`}
+              className={cn(
+                "min-w-0 flex-1 truncate rounded-md px-2 py-1.5 text-sm hover:bg-muted",
+                w.slug === currentSlug && "bg-muted font-medium"
+              )}
+            >
+              {w.name}
+            </Link>
+            {w.driveUrl && (
+              <a
+                href={w.driveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 rounded-md p-1 hover:bg-muted"
+                aria-label={`Apri Google Drive di ${w.name}`}
+              >
+                <GoogleDriveIcon className="size-4" />
+              </a>
             )}
-          >
-            {w.name}
-          </Link>
+          </div>
         ))}
         <div className="mt-1 px-2">
           <CreateWorkspaceDialog
