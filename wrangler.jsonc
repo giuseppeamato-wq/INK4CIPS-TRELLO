@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "ink4cips-trello-db",
-      "database_id": "local-placeholder-until-first-deploy",
+      "database_id": "1466bc2a-6f83-4910-b137-ae899adb59fa",
       "migrations_dir": "drizzle"
     }
   ],
