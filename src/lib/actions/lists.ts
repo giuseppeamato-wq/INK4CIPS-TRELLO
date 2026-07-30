@@ -5,6 +5,7 @@ import { getDb } from "@/db"
 import { lists } from "@/db/schema"
 import { requireSession } from "@/lib/auth/session"
 import {
+  ForbiddenError,
   getListBoardId,
   requireBoardMember,
   requireListEditor,
@@ -57,9 +58,12 @@ export async function deleteListAction(listId: string) {
   const session = await requireSession()
   await requireListEditor(listId, session.user.id)
 
+  const db = getDb()
+  const [list] = await db.select({ kind: lists.kind }).from(lists).where(eq(lists.id, listId))
+  if (list?.kind) throw new ForbiddenError("Questa lista è fissa e non può essere eliminata")
+
   const boardId = await getListBoardId(listId)
 
-  const db = getDb()
   await db.delete(lists).where(eq(lists.id, listId))
 
   if (boardId) {

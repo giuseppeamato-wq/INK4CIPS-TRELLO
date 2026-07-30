@@ -32,7 +32,7 @@ export function CreateListForm({
     try {
       const sortKey = keyBetween(lastSortKey, null)
       const list = await createListAction(boardId, trimmed, sortKey)
-      onCreated(list)
+      onCreated({ ...list, kind: null })
       setName("")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore imprevisto")

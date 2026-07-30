@@ -124,6 +124,11 @@ export const lists = sqliteTable(
       .references(() => boards.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     sortKey: text("sort_key").notNull(),
+    // Set only on the 3 fixed lists auto-created with every board (todo /
+    // in_progress / done) — null for regular user-created lists. Tracked by
+    // this stable kind rather than by name so renaming a fixed list doesn't
+    // lose its "can't be deleted" protection or its color.
+    kind: text("kind"),
     archived: integer("archived", { mode: "boolean" }).notNull().default(false),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
   },

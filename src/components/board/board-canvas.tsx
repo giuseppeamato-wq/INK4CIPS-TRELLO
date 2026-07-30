@@ -63,7 +63,9 @@ export function BoardCanvas({
   useBoardRealtime(boardId, (event) => {
     switch (event.type) {
       case "list.created":
-        setLists((prev) => (prev.some((l) => l.id === event.list.id) ? prev : [...prev, event.list]))
+        setLists((prev) =>
+          prev.some((l) => l.id === event.list.id) ? prev : [...prev, { ...event.list, kind: null }]
+        )
         break
       case "list.moved":
         setLists((prev) =>

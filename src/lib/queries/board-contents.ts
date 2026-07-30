@@ -2,6 +2,7 @@ import { and, asc, eq } from "drizzle-orm"
 import { getDb } from "@/db"
 import { cardLabels, cards, labels, lists } from "@/db/schema"
 import { requireBoardMember } from "@/lib/authz/guards"
+import type { ListKind } from "@/lib/list-kinds"
 
 export async function getBoardContents(boardId: string, requestingUserId: string) {
   await requireBoardMember(boardId, requestingUserId)
@@ -9,7 +10,7 @@ export async function getBoardContents(boardId: string, requestingUserId: string
 
   const [listRows, cardRows, labelRows] = await Promise.all([
     db
-      .select({ id: lists.id, name: lists.name, sortKey: lists.sortKey })
+      .select({ id: lists.id, name: lists.name, sortKey: lists.sortKey, kind: lists.kind })
       .from(lists)
       .where(and(eq(lists.boardId, boardId), eq(lists.archived, false)))
       .orderBy(asc(lists.sortKey)),
@@ -40,7 +41,7 @@ export async function getBoardContents(boardId: string, requestingUserId: string
   }
 
   return {
-    lists: listRows,
+    lists: listRows.map((l) => ({ ...l, kind: l.kind as ListKind | null })),
     cards: cardRows.map((c) => ({ ...c, labels: labelsByCard.get(c.id) ?? [] })),
   }
 }

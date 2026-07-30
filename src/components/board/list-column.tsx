@@ -17,10 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { renameListAction, deleteListAction } from "@/lib/actions/lists"
+import { LIST_KIND_INFO, type ListKind } from "@/lib/list-kinds"
 import { CardItem, type CardT } from "./card-item"
 import { CreateCardForm } from "./create-card-form"
 
-export type ListT = { id: string; name: string; sortKey: string }
+export type ListT = { id: string; name: string; sortKey: string; kind: ListKind | null }
 
 export function ListColumn({
   list,
@@ -93,55 +94,60 @@ export function ListColumn({
       ref={setSortableRef}
       style={style}
       className={cn(
-        "flex w-72 shrink-0 flex-col gap-2 rounded-xl bg-card/90 p-2.5 shadow-md shadow-black/20 backdrop-blur-sm",
+        "flex w-72 shrink-0 flex-col overflow-hidden rounded-xl bg-card/90 shadow-md shadow-black/20 backdrop-blur-sm",
         isDragging && "opacity-40"
       )}
     >
-      <div className="flex items-center gap-1">
-        {editing ? (
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={saveRename}
-            onKeyDown={(e) => e.key === "Enter" && saveRename()}
-            autoFocus
-            className="h-7 text-sm font-medium"
-          />
-        ) : (
-          <div
-            {...attributes}
-            {...listeners}
-            className="flex-1 cursor-grab truncate px-1 py-0.5 text-sm font-medium active:cursor-grabbing"
-          >
-            {list.name}
-          </div>
-        )}
-        {canEdit && !editing && (
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" />}>
-              <MoreHorizontal className="size-3.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setEditing(true)}>Rinomina</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={handleDelete}>
-                Elimina
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+      {list.kind && <div className={cn("h-1.5 shrink-0", LIST_KIND_INFO[list.kind].barClassName)} />}
+      <div className="flex flex-col gap-2 p-2.5">
+        <div className="flex items-center gap-1">
+          {editing ? (
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={saveRename}
+              onKeyDown={(e) => e.key === "Enter" && saveRename()}
+              autoFocus
+              className="h-7 text-sm font-medium"
+            />
+          ) : (
+            <div
+              {...attributes}
+              {...listeners}
+              className="flex-1 cursor-grab truncate px-1 py-0.5 text-sm font-medium active:cursor-grabbing"
+            >
+              {list.name}
+            </div>
+          )}
+          {canEdit && !editing && (
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" />}>
+                <MoreHorizontal className="size-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setEditing(true)}>Rinomina</DropdownMenuItem>
+                {!list.kind && (
+                  <DropdownMenuItem variant="destructive" onClick={handleDelete}>
+                    Elimina
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+        <div ref={setDroppableRef} className="flex flex-col gap-2 min-h-2">
+          <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+            {cards.map((card) => (
+              <CardItem key={card.id} card={card} onOpen={onCardOpen} />
+            ))}
+          </SortableContext>
+        </div>
+        <CreateCardForm
+          listId={list.id}
+          lastSortKey={cards.length ? cards[cards.length - 1].sortKey : null}
+          onCreated={onCardCreated}
+        />
       </div>
-      <div ref={setDroppableRef} className="flex flex-col gap-2 min-h-2">
-        <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          {cards.map((card) => (
-            <CardItem key={card.id} card={card} onOpen={onCardOpen} />
-          ))}
-        </SortableContext>
-      </div>
-      <CreateCardForm
-        listId={list.id}
-        lastSortKey={cards.length ? cards[cards.length - 1].sortKey : null}
-        onCreated={onCardCreated}
-      />
     </div>
   )
 }

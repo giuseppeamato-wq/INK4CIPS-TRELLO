@@ -2,10 +2,12 @@
 
 import { eq } from "drizzle-orm"
 import { getDb } from "@/db"
-import { boards } from "@/db/schema"
+import { boards, lists } from "@/db/schema"
 import { requireSession } from "@/lib/auth/session"
 import { requireBoardEditor, requireWorkspaceMember } from "@/lib/authz/guards"
 import { DEFAULT_BOARD_BACKGROUND_ID } from "@/lib/board-backgrounds"
+import { LIST_KIND_INFO, LIST_KIND_ORDER } from "@/lib/list-kinds"
+import { nKeysBetween } from "@/lib/ordering/position"
 
 export async function createBoardAction(workspaceId: string, name: string, background: string) {
   const session = await requireSession()
@@ -16,6 +18,16 @@ export async function createBoardAction(workspaceId: string, name: string, backg
     .insert(boards)
     .values({ workspaceId, name, background: background || DEFAULT_BOARD_BACKGROUND_ID, createdBy: session.user.id })
     .returning({ id: boards.id, name: boards.name })
+
+  const sortKeys = nKeysBetween(null, null, LIST_KIND_ORDER.length)
+  await db.insert(lists).values(
+    LIST_KIND_ORDER.map((kind, i) => ({
+      boardId: board.id,
+      name: LIST_KIND_INFO[kind].name,
+      sortKey: sortKeys[i],
+      kind,
+    }))
+  )
 
   return board
 }
