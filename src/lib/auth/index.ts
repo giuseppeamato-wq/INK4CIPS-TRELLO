@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { and, eq, sql } from "drizzle-orm"
+import { and, eq, inArray, sql } from "drizzle-orm"
 import { getDb } from "@/db"
-import { user as userTable, workspaceInvites, workspaceMembers } from "@/db/schema"
+import { user as userTable, workspaceInvites, workspaceMembers, workspaces } from "@/db/schema"
+import { createNotification } from "@/lib/notifications/create"
 
 type Db = ReturnType<typeof getDb>
 
@@ -40,6 +41,31 @@ async function reconcilePendingInvites(db: Db, email: string, userId: string) {
     )
 
   await db.batch([markAccepted, ...memberInserts])
+
+  // Best-effort — a notification failure here shouldn't undo the join above.
+  try {
+    const joinedWorkspaces = await db
+      .select({ id: workspaces.id, name: workspaces.name, slug: workspaces.slug })
+      .from(workspaces)
+      .where(
+        inArray(
+          workspaces.id,
+          pending.map((p) => p.workspaceId)
+        )
+      )
+    await Promise.all(
+      joinedWorkspaces.map((w) =>
+        createNotification({
+          userId,
+          type: "workspace_invite",
+          message: `Sei stato aggiunto al workspace "${w.name}"`,
+          url: `/w/${w.slug}`,
+        })
+      )
+    )
+  } catch {
+    // ignore
+  }
 }
 
 // Accepts an explicit env for call sites outside the Next.js request scope
@@ -57,6 +83,12 @@ export function getAuth(env?: CloudflareEnv) {
       // resta l'invito via workspace_invites, quindi un self-signup senza
       // verifica non apre accesso a nessun workspace.
       requireEmailVerification: false,
+    },
+    user: {
+      additionalFields: {
+        jobTitle: { type: "string", required: false, input: true },
+        bio: { type: "string", required: false, input: true },
+      },
     },
     session: {
       cookieCache: { enabled: true, maxAge: 60 },

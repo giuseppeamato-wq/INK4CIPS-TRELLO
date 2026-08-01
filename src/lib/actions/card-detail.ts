@@ -1,8 +1,9 @@
 "use server"
 
-import { and, eq } from "drizzle-orm"
+import { and, eq, ne } from "drizzle-orm"
 import { getDb } from "@/db"
 import {
+  boards,
   cardLabels,
   cardMembers,
   cards,
@@ -10,6 +11,7 @@ import {
   checklists,
   comments,
   labels,
+  workspaces,
 } from "@/db/schema"
 import { requireSession } from "@/lib/auth/session"
 import {
@@ -22,6 +24,18 @@ import {
 } from "@/lib/authz/guards"
 import { getBoardLabels, getBoardMembers, getCardDetail } from "@/lib/queries/card-detail"
 import { broadcastToBoard } from "@/lib/realtime/broadcast"
+import { createNotification } from "@/lib/notifications/create"
+
+async function getCardNotificationContext(db: ReturnType<typeof getDb>, cardId: string) {
+  const [row] = await db
+    .select({ title: cards.title, boardId: cards.boardId, workspaceSlug: workspaces.slug })
+    .from(cards)
+    .innerJoin(boards, eq(cards.boardId, boards.id))
+    .innerJoin(workspaces, eq(boards.workspaceId, workspaces.id))
+    .where(eq(cards.id, cardId))
+  if (!row) return null
+  return { ...row, url: `/w/${row.workspaceSlug}/b/${row.boardId}?card=${cardId}` }
+}
 
 export async function getCardDetailAction(cardId: string) {
   const session = await requireSession()
@@ -79,6 +93,19 @@ export async function toggleCardMemberAction(cardId: string, userId: string) {
     return { assigned: false }
   }
   await db.insert(cardMembers).values({ cardId, userId })
+
+  if (userId !== session.user.id) {
+    const ctx = await getCardNotificationContext(db, cardId)
+    if (ctx) {
+      await createNotification({
+        userId,
+        type: "card_assigned",
+        message: `${session.user.name} ti ha assegnato alla card "${ctx.title}"`,
+        url: ctx.url,
+      }).catch(() => {})
+    }
+  }
+
   return { assigned: true }
 }
 
@@ -161,6 +188,26 @@ export async function createCommentAction(cardId: string, body: string) {
     .insert(comments)
     .values({ cardId, authorId: session.user.id, body })
     .returning({ id: comments.id, body: comments.body, createdAt: comments.createdAt })
+
+  const otherMembers = await db
+    .select({ userId: cardMembers.userId })
+    .from(cardMembers)
+    .where(and(eq(cardMembers.cardId, cardId), ne(cardMembers.userId, session.user.id)))
+  if (otherMembers.length) {
+    const ctx = await getCardNotificationContext(db, cardId)
+    if (ctx) {
+      await Promise.all(
+        otherMembers.map((m) =>
+          createNotification({
+            userId: m.userId,
+            type: "card_comment",
+            message: `${session.user.name} ha commentato "${ctx.title}"`,
+            url: ctx.url,
+          }).catch(() => {})
+        )
+      )
+    }
+  }
 
   // Comments/checklists/labels aren't part of the board-level realtime feed
   // (that only covers list/card position, see src/durable-objects/board-room.ts) —

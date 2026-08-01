@@ -1,8 +1,10 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth/session"
+import { getRecentNotifications, getUnreadNotificationCount } from "@/lib/queries/notifications"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 
 // Every page under (app) reads a live session + live D1 data on every
 // request — never statically prerenderable, and getCloudflareContext()'s
@@ -20,6 +22,11 @@ export default async function AppLayout({
     redirect("/login")
   }
 
+  const [notifications, unreadCount] = await Promise.all([
+    getRecentNotifications(session.user.id),
+    getUnreadNotificationCount(session.user.id),
+  ])
+
   return (
     <div className="flex min-h-svh flex-col">
       <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
@@ -32,13 +39,16 @@ export default async function AppLayout({
           </span>
           <LogoutButton />
         </div>
-        <Link href="/profile" aria-label="Profilo" className="md:hidden">
-          <Avatar size="sm">
-            <AvatarFallback>
-              {(session.user.name ?? session.user.email ?? "?").slice(0, 1).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
+        <div className="flex items-center gap-2.5 md:hidden">
+          <NotificationBell initialNotifications={notifications} initialUnreadCount={unreadCount} />
+          <Link href="/profile" aria-label="Profilo">
+            <Avatar size="sm">
+              <AvatarFallback>
+                {(session.user.name ?? session.user.email ?? "?").slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+        </div>
       </header>
       <main className="flex min-h-0 flex-1 flex-col">{children}</main>
     </div>

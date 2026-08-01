@@ -11,6 +11,8 @@ export default async function EditProfilePage() {
       initialName={session.user.name}
       email={session.user.email}
       image={session.user.image ?? null}
+      initialJobTitle={session.user.jobTitle ?? ""}
+      initialBio={session.user.bio ?? ""}
     />
   )
 }

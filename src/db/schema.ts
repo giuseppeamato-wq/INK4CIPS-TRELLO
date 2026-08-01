@@ -11,6 +11,10 @@ export const user = sqliteTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" }).notNull().default(false),
   image: text("image"),
+  // Profile extras (mobile profile screen) — registered as better-auth
+  // additionalFields in src/lib/auth/index.ts so updateUser() can set them.
+  jobTitle: text("job_title"),
+  bio: text("bio"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 })
@@ -58,6 +62,9 @@ export const workspaces = sqliteTable("workspaces", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   driveUrl: text("drive_url"),
+  // R2 key under the ATTACHMENTS bucket (workspace-covers/{id}/{uuid}-{filename}),
+  // never a public URL — served through /api/workspaces/[workspaceId]/cover.
+  coverPath: text("cover_path"),
   createdBy: text("created_by").notNull().references(() => user.id),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 })
@@ -263,4 +270,24 @@ export const attachments = sqliteTable(
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
   },
   (t) => [index("attachments_card_id_idx").on(t.cardId)]
+)
+
+export const notificationTypeValues = ["card_assigned", "workspace_invite", "card_comment"] as const
+export type NotificationType = (typeof notificationTypeValues)[number]
+
+export const notifications = sqliteTable(
+  "notifications",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    type: text("type", { enum: notificationTypeValues }).notNull(),
+    message: text("message").notNull(),
+    // Relative in-app path to open when tapped, e.g. /w/acme/b/123?card=456.
+    url: text("url"),
+    isRead: integer("is_read", { mode: "boolean" }).notNull().default(false),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  },
+  (t) => [index("notifications_user_id_created_at_idx").on(t.userId, t.createdAt)]
 )

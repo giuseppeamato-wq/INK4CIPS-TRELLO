@@ -43,6 +43,13 @@
       "when": 1785421641667,
       "tag": "0005_living_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1785600392301,
+      "tag": "0006_sour_robin_chapel",
+      "breakpoints": true
     }
   ]
 }

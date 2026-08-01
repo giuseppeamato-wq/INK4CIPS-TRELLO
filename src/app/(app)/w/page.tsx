@@ -28,12 +28,19 @@ export default async function ChooseWorkspacePage() {
             className="flex items-center gap-3.5 rounded-2xl border p-3.5"
           >
             <Link href={`/w/${ws.slug}`} className="flex min-w-0 flex-1 items-center gap-3.5">
-              <div
-                className="flex size-11 shrink-0 items-center justify-center rounded-xl font-heading text-base font-bold text-white"
-                style={{ backgroundColor: colorForWorkspace(ws.id) }}
-              >
-                {ws.name.slice(0, 1).toUpperCase()}
-              </div>
+              {ws.coverPath ? (
+                <div
+                  className="size-11 shrink-0 rounded-xl bg-cover bg-center"
+                  style={{ backgroundImage: `url('/api/workspaces/${ws.id}/cover')` }}
+                />
+              ) : (
+                <div
+                  className="flex size-11 shrink-0 items-center justify-center rounded-xl font-heading text-base font-bold text-white"
+                  style={{ backgroundColor: colorForWorkspace(ws.id) }}
+                >
+                  {ws.name.slice(0, 1).toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0">
                 <div className="truncate font-heading text-sm font-bold">{ws.name}</div>
                 <div className="text-xs text-muted-foreground">

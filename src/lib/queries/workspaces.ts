@@ -18,6 +18,7 @@ export async function getUserWorkspaces(userId: string) {
       name: workspaces.name,
       slug: workspaces.slug,
       driveUrl: workspaces.driveUrl,
+      coverPath: workspaces.coverPath,
       createdAt: workspaces.createdAt,
     })
     .from(workspaces)
