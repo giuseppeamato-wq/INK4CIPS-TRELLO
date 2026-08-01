@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm"
 import { getDb } from "@/db"
 import { workspaceInvites, workspaceMembers, workspaces } from "@/db/schema"
 import { requireSession } from "@/lib/auth/session"
-import { ForbiddenError, requireWorkspaceAdmin } from "@/lib/authz/guards"
+import { ForbiddenError, requireWorkspaceAdmin, requireWorkspaceOwner } from "@/lib/authz/guards"
 import { slugify } from "@/lib/slug"
 
 export async function createWorkspaceAction(name: string) {
@@ -73,4 +73,22 @@ export async function updateWorkspaceDriveUrlAction(workspaceId: string, driveUr
     .update(workspaces)
     .set({ driveUrl: driveUrl || null })
     .where(eq(workspaces.id, workspaceId))
+}
+
+export async function renameWorkspaceAction(workspaceId: string, name: string) {
+  const session = await requireSession()
+  await requireWorkspaceAdmin(workspaceId, session.user.id)
+
+  const db = getDb()
+  await db.update(workspaces).set({ name }).where(eq(workspaces.id, workspaceId))
+}
+
+export async function deleteWorkspaceAction(workspaceId: string) {
+  const session = await requireSession()
+  await requireWorkspaceOwner(workspaceId, session.user.id)
+
+  const db = getDb()
+  // Cascades to workspaceMembers/workspaceInvites/boards (and, through boards,
+  // to lists/cards/labels/checklists/comments/attachments) via existing FKs.
+  await db.delete(workspaces).where(eq(workspaces.id, workspaceId))
 }

@@ -21,9 +21,11 @@ import { keyBetween } from "@/lib/ordering/position"
 import { useBoardRealtime } from "@/lib/realtime/use-board-realtime"
 import { getBoardBackground } from "@/lib/board-backgrounds"
 import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { ListColumn, type ListT } from "./list-column"
 import { CardItem, type CardT } from "./card-item"
 import { CreateListForm } from "./create-list-form"
+import { MobileBoardView } from "./mobile-board-view"
 import { CardModal } from "@/components/card-detail/card-modal"
 
 export function BoardCanvas({
@@ -55,6 +57,8 @@ export function BoardCanvas({
   function closeCard() {
     router.push("?", { scroll: false })
   }
+
+  const isMobile = useIsMobile()
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
@@ -212,6 +216,46 @@ export function BoardCanvas({
         toast.error(err instanceof Error ? err.message : "Errore nello spostamento della card")
       })
     }
+  }
+
+  if (isMobile) {
+    const openCard_ = openCardId ? cards.find((c) => c.id === openCardId) : null
+    const openCardKind = openCard_
+      ? sortedLists.find((l) => l.id === openCard_.listId)?.kind
+      : null
+
+    return (
+      <>
+        <MobileBoardView
+          lists={sortedLists}
+          cards={cards}
+          canEdit={canEdit}
+          onCardOpen={openCard}
+          onCardCreated={(card) =>
+            setCards((prev) => (prev.some((c) => c.id === card.id) ? prev : [...prev, card]))
+          }
+        />
+        {openCardId && (
+          <CardModal
+            key={openCardId}
+            cardId={openCardId}
+            boardId={boardId}
+            canEdit={canEdit}
+            cardKind={openCardKind}
+            onOpenChange={(open) => {
+              if (!open) closeCard()
+            }}
+            onTitleChanged={(cardId, title) =>
+              setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, title } : c)))
+            }
+            onDeleted={(cardId) => {
+              setCards((prev) => prev.filter((c) => c.id !== cardId))
+              closeCard()
+            }}
+          />
+        )}
+      </>
+    )
   }
 
   return (

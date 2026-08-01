@@ -34,7 +34,13 @@ const schema = z.object({
   background: z.string(),
 })
 
-export function CreateBoardDialog({ workspaceId }: { workspaceId: string }) {
+export function CreateBoardDialog({
+  workspaceId,
+  trigger,
+}: {
+  workspaceId: string
+  trigger?: React.ReactElement
+}) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -60,7 +66,7 @@ export function CreateBoardDialog({ workspaceId }: { workspaceId: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button>Nuova board</Button>} />
+      <DialogTrigger render={trigger ?? <Button>Nuova board</Button>} />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Nuova board</DialogTitle>

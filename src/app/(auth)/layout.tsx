@@ -15,7 +15,7 @@ export default async function AuthLayout({
   if (session) redirect("/")
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-muted/30 p-4">
+    <div className="flex min-h-svh items-center justify-center bg-background sm:bg-muted/30 sm:p-4">
       <div className="w-full max-w-sm">{children}</div>
     </div>
   )

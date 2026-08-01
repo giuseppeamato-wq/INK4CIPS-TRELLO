@@ -1,11 +1,9 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutGrid, Settings, Plus, Menu, X } from "lucide-react"
+import { ChevronDown, LayoutGrid, Settings, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
 
 type WorkspaceSummary = { id: string; name: string; slug: string; role: string; driveUrl: string | null }
@@ -29,7 +27,10 @@ export function WorkspaceSidebar({
 }) {
   const pathname = usePathname()
   const isSettings = pathname.endsWith("/settings")
-  const [mobileOpen, setMobileOpen] = useState(false)
+  // A board's own gradient header already provides back-navigation and
+  // context, so the plain workspace bar would just duplicate it on mobile.
+  const isBoardDetail = /\/b\/[^/]+$/.test(pathname)
+  const current = workspaces.find((w) => w.slug === currentSlug)
 
   const content = (
     <>
@@ -105,37 +106,20 @@ export function WorkspaceSidebar({
 
   return (
     <>
-      {/* Mobile: floating toggle + slide-over drawer */}
-      <Button
-        variant="outline"
-        size="icon-sm"
-        className="fixed top-[68px] left-3 z-40 md:hidden"
-        onClick={() => setMobileOpen(true)}
-        aria-label="Apri menu"
-      >
-        <Menu className="size-4" />
-      </Button>
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <button
-            aria-label="Chiudi menu"
-            className="absolute inset-0 bg-black/30"
-            onClick={() => setMobileOpen(false)}
-          />
-          <aside
-            className="absolute inset-y-0 left-0 flex w-64 flex-col gap-4 overflow-y-auto bg-background p-4 shadow-lg"
-            onClick={(e) => {
-              if ((e.target as HTMLElement).closest("a")) setMobileOpen(false)
-            }}
-          >
-            <div className="flex justify-end">
-              <Button variant="ghost" size="icon-sm" onClick={() => setMobileOpen(false)} aria-label="Chiudi menu">
-                <X className="size-4" />
-              </Button>
-            </div>
-            {content}
-          </aside>
-        </div>
+      {/* Mobile: static bar linking to the full-screen workspace switcher */}
+      {!isBoardDetail && (
+        <Link
+          href="/w"
+          className="flex items-center justify-between border-b px-4 py-2.5 md:hidden"
+        >
+          <div>
+            <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              Workspace
+              <ChevronDown className="size-3" />
+            </span>
+            <span className="font-heading text-base font-bold">{current?.name}</span>
+          </div>
+        </Link>
       )}
 
       {/* Desktop: static sidebar */}

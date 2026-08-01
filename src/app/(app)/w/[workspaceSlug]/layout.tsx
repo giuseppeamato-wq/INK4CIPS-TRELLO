@@ -25,9 +25,9 @@ export default async function WorkspaceLayout({
   if (!workspace) notFound()
 
   return (
-    <div className="flex flex-1">
+    <div className="flex flex-1 flex-col md:flex-row">
       <WorkspaceSidebar workspaces={workspaces} currentSlug={workspaceSlug} />
-      <div className="flex-1 overflow-y-auto pt-12 md:pt-0">{children}</div>
+      <div className="flex-1 overflow-y-auto">{children}</div>
     </div>
   )
 }

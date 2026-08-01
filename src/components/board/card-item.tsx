@@ -16,7 +16,9 @@ export type CardT = {
   title: string
   sortKey: string
   dueDate: Date | null
-  labels: { id: string; color: string }[]
+  labels: { id: string; color: string; name?: string }[]
+  checklist?: { done: number; total: number } | null
+  assignees?: { userId: string; name: string }[]
 }
 
 export function CardItem({ card, onOpen }: { card: CardT; onOpen?: (cardId: string) => void }) {

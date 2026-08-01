@@ -1,4 +1,6 @@
+import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
+import { Plus, Settings } from "lucide-react"
 import { getSession } from "@/lib/auth/session"
 import { getMyRoleInWorkspace, getWorkspaceBySlug } from "@/lib/queries/workspaces"
 import { getBoardsForWorkspace } from "@/lib/queries/boards"
@@ -24,10 +26,12 @@ export default async function WorkspaceBoardsPage({
   const canEdit = myRole === "owner" || myRole === "admin" || myRole === "editor"
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="relative flex flex-1 flex-col gap-6 p-5 md:p-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-lg font-semibold">{workspace.name}</h1>
-        <CreateBoardDialog workspaceId={workspace.id} />
+        <div className="hidden md:block">
+          <CreateBoardDialog workspaceId={workspace.id} />
+        </div>
       </div>
 
       {boards.length === 0 ? (
@@ -35,12 +39,43 @@ export default async function WorkspaceBoardsPage({
           Nessuna board ancora. Creane una per iniziare a organizzare il lavoro.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 pb-20 sm:grid-cols-3 md:gap-4 md:pb-0 lg:grid-cols-4">
           {boards.map((board) => (
-            <BoardCard key={board.id} board={board} workspaceSlug={workspaceSlug} canEdit={canEdit} />
+            <BoardCard
+              key={board.id}
+              board={board}
+              workspaceSlug={workspaceSlug}
+              workspaceName={workspace.name}
+              canEdit={canEdit}
+            />
           ))}
         </div>
       )}
+
+      {/* Mobile: floating actions, matching the mockup's gear + plus FABs */}
+      <div className="fixed bottom-6 left-5 md:hidden">
+        <Link
+          href={`/w/${workspaceSlug}/settings`}
+          aria-label="Impostazioni workspace"
+          className="flex size-12 items-center justify-center rounded-full border bg-background shadow-lg"
+        >
+          <Settings className="size-[19px]" />
+        </Link>
+      </div>
+      <div className="fixed right-5 bottom-6 md:hidden">
+        <CreateBoardDialog
+          workspaceId={workspace.id}
+          trigger={
+            <button
+              type="button"
+              aria-label="Nuova board"
+              className="flex size-[52px] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+            >
+              <Plus className="size-[22px]" />
+            </button>
+          }
+        />
+      </div>
     </div>
   )
 }

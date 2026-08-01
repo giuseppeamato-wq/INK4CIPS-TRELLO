@@ -29,6 +29,12 @@ export async function requireWorkspaceAdmin(workspaceId: string, userId: string,
   return role
 }
 
+export async function requireWorkspaceOwner(workspaceId: string, userId: string, env?: CloudflareEnv) {
+  const role = await requireWorkspaceMember(workspaceId, userId, env)
+  if (role !== "owner") throw new ForbiddenError("Requires owner role")
+  return role
+}
+
 // Renaming/deleting boards, lists and cards requires editor-or-above — plain
 // members can still create/comment/assign/etc, just not restructure or
 // remove things. Member management stays admin/owner-only (requireWorkspaceAdmin).

@@ -22,10 +22,12 @@ import { cn } from "@/lib/utils"
 export function BoardCard({
   board,
   workspaceSlug,
+  workspaceName,
   canEdit,
 }: {
   board: { id: string; name: string; background: string | null }
   workspaceSlug: string
+  workspaceName: string
   canEdit: boolean
 }) {
   const router = useRouter()
@@ -68,7 +70,22 @@ export function BoardCard({
 
   return (
     <>
-      <div className="relative">
+      {/* Mobile: full-tile gradient, tap-only (rename/delete/color live in the
+          board's own "modifica board" sheet, matching the mockup). */}
+      <Link
+        href={`/w/${workspaceSlug}/b/${board.id}`}
+        className={cn(
+          "flex h-[110px] flex-col justify-between overflow-hidden rounded-2xl p-3 md:hidden",
+          getBoardBackground(board.background).className
+        )}
+      >
+        <span className="font-heading text-sm leading-tight font-bold text-white [text-shadow:0_1px_4px_rgb(0_0_0_/_0.2)]">
+          {board.name}
+        </span>
+        <span className="text-xs font-medium text-white/85">{workspaceName}</span>
+      </Link>
+
+      <div className="relative hidden md:block">
         <Link href={`/w/${workspaceSlug}/b/${board.id}`}>
           <Card className="h-24 justify-center overflow-hidden transition-colors hover:bg-muted/50">
             <div className={cn("h-8", getBoardBackground(board.background).className)} />

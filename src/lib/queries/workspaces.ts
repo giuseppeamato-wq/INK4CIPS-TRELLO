@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray } from "drizzle-orm"
 import { getDb } from "@/db"
-import { user, workspaceInvites, workspaceMembers, workspaces } from "@/db/schema"
+import { boards, user, workspaceInvites, workspaceMembers, workspaces } from "@/db/schema"
 import { requireWorkspaceMember } from "@/lib/authz/guards"
 
 export async function getUserWorkspaces(userId: string) {
@@ -32,6 +32,32 @@ export async function getUserWorkspaces(userId: string) {
   return rows
     .map((w) => ({ ...w, role: roleByWorkspace.get(w.id)! }))
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+}
+
+export async function getUserWorkspacesWithBoardCount(userId: string) {
+  const workspacesList = await getUserWorkspaces(userId)
+  if (!workspacesList.length) return []
+
+  const db = getDb()
+  const boardRows = await db
+    .select({ workspaceId: boards.workspaceId })
+    .from(boards)
+    .where(
+      and(
+        inArray(
+          boards.workspaceId,
+          workspacesList.map((w) => w.id)
+        ),
+        eq(boards.archived, false)
+      )
+    )
+
+  const countByWorkspace = new Map<string, number>()
+  for (const row of boardRows) {
+    countByWorkspace.set(row.workspaceId, (countByWorkspace.get(row.workspaceId) ?? 0) + 1)
+  }
+
+  return workspacesList.map((w) => ({ ...w, boardCount: countByWorkspace.get(w.id) ?? 0 }))
 }
 
 export async function getWorkspaceBySlug(slug: string, userId: string) {

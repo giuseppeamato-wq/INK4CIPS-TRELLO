@@ -2,17 +2,24 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, X } from "lucide-react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  BottomSheet,
+  BottomSheetContent,
+} from "@/components/ui/bottom-sheet"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { LIST_KIND_INFO, type ListKind } from "@/lib/list-kinds"
 import {
   getCardDetailAction,
   getCardPickersAction,
@@ -34,6 +41,7 @@ export function CardModal({
   cardId,
   boardId,
   canEdit,
+  cardKind,
   onOpenChange,
   onTitleChanged,
   onDeleted,
@@ -41,10 +49,12 @@ export function CardModal({
   cardId: string
   boardId: string
   canEdit: boolean
+  cardKind?: ListKind | null
   onOpenChange: (open: boolean) => void
   onTitleChanged: (cardId: string, title: string) => void
   onDeleted: (cardId: string) => void
 }) {
+  const isMobile = useIsMobile()
   const [detail, setDetail] = useState<CardDetailT | null>(null)
   const [boardMembers, setBoardMembers] = useState<BoardMemberT[]>([])
   const [boardLabels, setBoardLabels] = useState<CardDetailT["labels"]>([])
@@ -133,37 +143,84 @@ export function CardModal({
     }
   }
 
-  return (
-    <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto sm:max-w-lg">
-        {loading || !detail ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">Caricamento...</div>
+  const header = isMobile ? (
+    <div className="mb-1 flex items-center justify-between">
+      {cardKind ? (
+        <span
+          className={cn(
+            "text-[11px] font-bold tracking-wide uppercase",
+            LIST_KIND_INFO[cardKind].textClassName
+          )}
+        >
+          {LIST_KIND_INFO[cardKind].name}
+        </span>
+      ) : (
+        <span />
+      )}
+      <button
+        onClick={() => onOpenChange(false)}
+        aria-label="Chiudi"
+        className="flex size-7 items-center justify-center rounded-full bg-muted"
+      >
+        <X className="size-3.5" />
+      </button>
+    </div>
+  ) : null
+
+  const body =
+    loading || !detail ? (
+      <div className="p-8 text-center text-sm text-muted-foreground">Caricamento...</div>
+    ) : (
+      <div className="flex flex-col gap-5">
+        {header}
+        {isMobile ? (
+          <div className="flex items-start justify-between gap-2">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={saveTitle}
+              readOnly={!canEdit}
+              className="border-none px-0 font-heading text-lg font-extrabold shadow-none focus-visible:ring-0 read-only:cursor-default"
+            />
+            {canEdit && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="shrink-0 text-muted-foreground hover:text-destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                aria-label="Elimina card"
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            )}
+          </div>
         ) : (
-          <div className="flex flex-col gap-5">
-            <DialogHeader>
-              <div className="flex items-center gap-2 pr-6">
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  onBlur={saveTitle}
-                  readOnly={!canEdit}
-                  className="border-none px-0 text-base font-semibold shadow-none focus-visible:ring-0 read-only:cursor-default"
-                />
-                {canEdit && (
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="shrink-0 text-muted-foreground hover:text-destructive"
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    aria-label="Elimina card"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                )}
-              </div>
-              <DialogTitle className="sr-only">Dettaglio card</DialogTitle>
-            </DialogHeader>
+          <DialogHeader>
+            <div className="flex items-center gap-2 pr-6">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onBlur={saveTitle}
+                readOnly={!canEdit}
+                className="border-none px-0 text-base font-semibold shadow-none focus-visible:ring-0 read-only:cursor-default"
+              />
+              {canEdit && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  aria-label="Elimina card"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              )}
+            </div>
+            <DialogTitle className="sr-only">Dettaglio card</DialogTitle>
+          </DialogHeader>
+        )}
 
             <div className="flex flex-col gap-2">
               <span className="text-xs font-medium text-muted-foreground">Membri</span>
@@ -254,7 +311,20 @@ export function CardModal({
               />
             </div>
           </div>
-        )}
+        )
+
+  if (isMobile) {
+    return (
+      <BottomSheet open onOpenChange={onOpenChange}>
+        <BottomSheetContent>{body}</BottomSheetContent>
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <Dialog open onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto sm:max-w-lg">
+        {body}
       </DialogContent>
     </Dialog>
   )
