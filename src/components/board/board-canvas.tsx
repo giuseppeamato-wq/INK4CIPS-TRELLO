@@ -294,7 +294,12 @@ export function BoardCanvas({
         />
       </div>
       <DragOverlay>
-        {activeCard ? <CardItem card={activeCard} /> : null}
+        {activeCard ? (
+          <CardItem
+            card={activeCard}
+            kind={sortedLists.find((l) => l.id === activeCard.listId)?.kind}
+          />
+        ) : null}
         {activeList ? (
           <div className="w-72 rounded-xl bg-card/90 p-2.5 text-sm font-medium shadow-lg shadow-black/20 backdrop-blur-sm">
             {activeList.name}

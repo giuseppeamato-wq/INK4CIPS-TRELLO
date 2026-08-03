@@ -139,7 +139,7 @@ export function ListColumn({
         <div ref={setDroppableRef} className="flex flex-col gap-2 min-h-2">
           <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
             {cards.map((card) => (
-              <CardItem key={card.id} card={card} onOpen={onCardOpen} />
+              <CardItem key={card.id} card={card} kind={list.kind} onOpen={onCardOpen} />
             ))}
           </SortableContext>
         </div>
