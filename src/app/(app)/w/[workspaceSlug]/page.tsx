@@ -28,7 +28,12 @@ export default async function WorkspaceBoardsPage({
   return (
     <div className="relative flex flex-1 flex-col gap-6 p-5 md:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-heading text-lg font-semibold">{workspace.name}</h1>
+        <div>
+          <div className="hidden text-xs font-medium text-muted-foreground md:block">Workspace</div>
+          <h1 className="font-heading text-lg font-semibold md:text-2xl md:font-extrabold">
+            {workspace.name}
+          </h1>
+        </div>
         <div className="hidden md:block">
           <CreateBoardDialog workspaceId={workspace.id} />
         </div>

@@ -218,12 +218,12 @@ export function BoardCanvas({
     }
   }
 
-  if (isMobile) {
-    const openCard_ = openCardId ? cards.find((c) => c.id === openCardId) : null
-    const openCardKind = openCard_
-      ? sortedLists.find((l) => l.id === openCard_.listId)?.kind
-      : null
+  const openCard_ = openCardId ? cards.find((c) => c.id === openCardId) : null
+  const openCardKind = openCard_
+    ? sortedLists.find((l) => l.id === openCard_.listId)?.kind
+    : null
 
+  if (isMobile) {
     return (
       <>
         <MobileBoardView
@@ -311,6 +311,7 @@ export function BoardCanvas({
           cardId={openCardId}
           boardId={boardId}
           canEdit={canEdit}
+          cardKind={openCardKind}
           onOpenChange={(open) => {
             if (!open) closeCard()
           }}

@@ -61,9 +61,9 @@ export default function LoginPage() {
     <Card className="rounded-none py-8 ring-0 sm:rounded-xl sm:py-(--card-spacing) sm:ring-1">
       <CardHeader>
         <img src="/logo.png" alt="INK4CIPS" className="mx-auto mb-2 size-16 rounded-xl" />
-        <CardTitle className="text-center">Accedi a INK4CIPS</CardTitle>
+        <CardTitle className="text-center">Bentornato</CardTitle>
         <CardDescription className="text-center">
-          Inserisci le tue credenziali per accedere ai tuoi progetti.
+          Accedi al tuo spazio di lavoro per continuare.
         </CardDescription>
       </CardHeader>
       <Form {...form}>

@@ -23,6 +23,7 @@ export default async function AuthLayout({
           <span className="font-heading text-3xl font-extrabold tracking-tight text-white">
             INK4CIPS
           </span>
+          <p className="text-sm text-white/70">LA PEPPEFORMA</p>
           <p className="max-w-xs text-sm text-white/70">
             Organizza i tuoi progetti in workspace, board e card, tutto in un unico posto.
           </p>

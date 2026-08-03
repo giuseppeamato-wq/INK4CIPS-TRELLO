@@ -207,6 +207,16 @@ export function CardModal({
           </div>
         ) : (
           <DialogHeader>
+            {cardKind && (
+              <span
+                className={cn(
+                  "text-[11px] font-bold tracking-wide uppercase",
+                  LIST_KIND_INFO[cardKind].textClassName
+                )}
+              >
+                {LIST_KIND_INFO[cardKind].name}
+              </span>
+            )}
             <div className="flex items-center gap-2 pr-6">
               <Input
                 value={title}

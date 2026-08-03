@@ -114,9 +114,10 @@ export function ListColumn({
             <div
               {...attributes}
               {...listeners}
-              className="flex-1 cursor-grab truncate px-1 py-0.5 text-sm font-medium active:cursor-grabbing"
+              className="flex flex-1 cursor-grab items-center gap-1.5 truncate px-1 py-0.5 text-sm font-medium active:cursor-grabbing"
             >
-              {list.name}
+              <span className="truncate">{list.name}</span>
+              <span className="text-xs font-normal text-muted-foreground">{cards.length}</span>
             </div>
           )}
           {canEdit && !editing && (

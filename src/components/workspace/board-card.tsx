@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { MoreHorizontal } from "lucide-react"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -70,29 +69,21 @@ export function BoardCard({
 
   return (
     <>
-      {/* Mobile: full-tile gradient, tap-only (rename/delete/color live in the
-          board's own "modifica board" sheet, matching the mockup). */}
-      <Link
-        href={`/w/${workspaceSlug}/b/${board.id}`}
-        className={cn(
-          "flex h-[110px] flex-col justify-between overflow-hidden rounded-2xl p-3 md:hidden",
-          getBoardBackground(board.background).className
-        )}
-      >
-        <span className="font-heading text-sm leading-tight font-bold text-white [text-shadow:0_1px_4px_rgb(0_0_0_/_0.2)]">
-          {board.name}
-        </span>
-        <span className="text-xs font-medium text-white/85">{workspaceName}</span>
-      </Link>
-
-      <div className="relative hidden md:block">
-        <Link href={`/w/${workspaceSlug}/b/${board.id}`}>
-          <Card className="h-24 justify-center overflow-hidden transition-colors hover:bg-muted/50">
-            <div className={cn("h-8", getBoardBackground(board.background).className)} />
-            <CardHeader>
-              <CardTitle className="pr-6 text-sm">{board.name}</CardTitle>
-            </CardHeader>
-          </Card>
+      {/* Full-tile gradient at every breakpoint, matching the design system's
+          board grid (rename/delete/color also live in the board's own
+          "modifica progetto" dialog, this menu is just a shortcut). */}
+      <div className="relative">
+        <Link
+          href={`/w/${workspaceSlug}/b/${board.id}`}
+          className={cn(
+            "flex h-[110px] flex-col justify-between overflow-hidden rounded-2xl p-3 md:h-[130px] md:p-4",
+            getBoardBackground(board.background).className
+          )}
+        >
+          <span className="font-heading text-sm leading-tight font-bold text-white [text-shadow:0_1px_4px_rgb(0_0_0_/_0.2)]">
+            {board.name}
+          </span>
+          <span className="text-xs font-medium text-white/85">{workspaceName}</span>
         </Link>
         {canEdit && (
           <DropdownMenu>
@@ -101,7 +92,7 @@ export function BoardCard({
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  className="absolute top-2 right-2"
+                  className="absolute top-2 right-2 text-white hover:bg-white/20 hover:text-white"
                   onClick={(e) => e.preventDefault()}
                 />
               }

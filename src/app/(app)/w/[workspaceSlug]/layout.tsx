@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { getSession } from "@/lib/auth/session"
 import { getUserWorkspaces, getWorkspaceBySlug } from "@/lib/queries/workspaces"
 import { WorkspaceSidebar } from "@/components/workspace/workspace-sidebar"
+import { WorkspaceDriveFab } from "@/components/workspace/workspace-drive-fab"
 
 export default async function WorkspaceLayout({
   children,
@@ -35,7 +36,10 @@ export default async function WorkspaceLayout({
           image: session.user.image ?? null,
         }}
       />
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      <div className="relative flex-1 overflow-y-auto">
+        {children}
+        <WorkspaceDriveFab driveUrl={workspace.driveUrl} />
+      </div>
     </div>
   )
 }

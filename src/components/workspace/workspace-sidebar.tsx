@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronDown, LayoutGrid, Settings, Plus, User } from "lucide-react"
+import { ChevronDown, LayoutGrid, MoreHorizontal, Settings, Plus, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { colorForWorkspace } from "@/lib/workspace-colors"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
+import { EditWorkspaceSheet } from "@/components/workspace/edit-workspace-sheet"
 
 type WorkspaceSummary = {
   id: string
@@ -88,13 +89,29 @@ export function WorkspaceSidebar({
                 <GoogleDriveIcon className="size-4" />
               </a>
             )}
+            {(w.role === "owner" || w.role === "admin") && (
+              <EditWorkspaceSheet
+                workspace={w}
+                trigger={
+                  <button
+                    type="button"
+                    aria-label={`Modifica ${w.name}`}
+                    className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <MoreHorizontal className="size-3.5" />
+                  </button>
+                }
+              />
+            )}
           </div>
         ))}
         <div className="mt-1 px-2">
           <CreateWorkspaceDialog
             trigger={
-              <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-                <Plus className="size-3.5" />
+              <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                <span className="flex size-[22px] shrink-0 items-center justify-center rounded-md bg-muted">
+                  <Plus className="size-3" />
+                </span>
                 Nuovo workspace
               </button>
             }
