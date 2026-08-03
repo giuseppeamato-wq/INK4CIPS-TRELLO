@@ -26,7 +26,15 @@ export default async function WorkspaceLayout({
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
-      <WorkspaceSidebar workspaces={workspaces} currentSlug={workspaceSlug} />
+      <WorkspaceSidebar
+        workspaces={workspaces}
+        currentSlug={workspaceSlug}
+        currentUser={{
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image ?? null,
+        }}
+      />
       <div className="flex-1 overflow-y-auto">{children}</div>
     </div>
   )

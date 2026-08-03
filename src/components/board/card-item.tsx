@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Clock } from "lucide-react"
+import { CheckSquare, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 // Module-scope, evaluated once at load — not a render-time impure call, so
@@ -33,6 +33,8 @@ export function CardItem({ card, onOpen }: { card: CardT; onOpen?: (cardId: stri
   }
 
   const isOverdue = card.dueDate ? card.dueDate.getTime() < now : false
+  const hasChecklist = !!card.checklist && card.checklist.total > 0
+  const hasAssignees = !!card.assignees && card.assignees.length > 0
 
   return (
     <div
@@ -54,16 +56,39 @@ export function CardItem({ card, onOpen }: { card: CardT; onOpen?: (cardId: stri
         </div>
       )}
       <span>{card.title}</span>
-      {card.dueDate && (
-        <span
-          className={cn(
-            "inline-flex w-fit items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium",
-            isOverdue ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+      {(hasChecklist || card.dueDate) && (
+        <div className="flex flex-wrap items-center gap-2">
+          {hasChecklist && (
+            <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <CheckSquare className="size-3" />
+              {card.checklist!.done}/{card.checklist!.total}
+            </span>
           )}
-        >
-          <Clock className="size-3" />
-          {card.dueDate.toLocaleDateString("it-IT", { day: "numeric", month: "short" })}
-        </span>
+          {card.dueDate && (
+            <span
+              className={cn(
+                "inline-flex w-fit items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium",
+                isOverdue ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+              )}
+            >
+              <Clock className="size-3" />
+              {card.dueDate.toLocaleDateString("it-IT", { day: "numeric", month: "short" })}
+            </span>
+          )}
+        </div>
+      )}
+      {hasAssignees && (
+        <div className="flex items-center">
+          {card.assignees!.slice(0, 3).map((person, i) => (
+            <div
+              key={person.userId}
+              style={{ marginLeft: i === 0 ? 0 : -8 }}
+              className="flex size-5 items-center justify-center rounded-full border-2 border-card bg-secondary font-heading text-[9px] font-bold"
+            >
+              {person.name.slice(0, 1).toUpperCase()}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

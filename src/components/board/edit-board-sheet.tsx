@@ -11,6 +11,7 @@ import { BOARD_BACKGROUNDS } from "@/lib/board-backgrounds"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
   BottomSheet,
   BottomSheetContent,
@@ -18,6 +19,13 @@ import {
   BottomSheetTitle,
   BottomSheetTrigger,
 } from "@/components/ui/bottom-sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 type Member = { userId: string; role: string; name: string | null; email: string }
 
@@ -90,14 +98,10 @@ export function EditBoardSheet({
     }
   }
 
-  return (
-    <BottomSheet open={open} onOpenChange={onOpenChange}>
-      <BottomSheetTrigger render={trigger} />
-      <BottomSheetContent>
-        <BottomSheetHeader>
-          <BottomSheetTitle>Modifica progetto</BottomSheetTitle>
-        </BottomSheetHeader>
+  const isMobile = useIsMobile()
 
+  const body = (
+    <>
         <div className="flex flex-col gap-2 pb-5">
           <label className="text-xs font-medium">Nome progetto</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
@@ -209,7 +213,32 @@ export function EditBoardSheet({
             Elimina progetto
           </button>
         )}
-      </BottomSheetContent>
-    </BottomSheet>
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={open} onOpenChange={onOpenChange}>
+        <BottomSheetTrigger render={trigger} />
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle>Modifica progetto</BottomSheetTitle>
+          </BottomSheetHeader>
+          {body}
+        </BottomSheetContent>
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger render={trigger} />
+      <DialogContent className="max-h-[85vh] max-w-md overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Modifica progetto</DialogTitle>
+        </DialogHeader>
+        {body}
+      </DialogContent>
+    </Dialog>
   )
 }

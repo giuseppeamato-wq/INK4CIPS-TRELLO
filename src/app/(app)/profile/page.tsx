@@ -1,9 +1,10 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ChevronRight, Settings } from "lucide-react"
+import { Bell, ChevronRight, HelpCircle, Settings } from "lucide-react"
 import { getSession } from "@/lib/auth/session"
 import { getUserWorkspaces } from "@/lib/queries/workspaces"
 import { getProfileStats } from "@/lib/queries/profile"
+import { getUnreadNotificationCount } from "@/lib/queries/notifications"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { LogoutButton } from "@/components/auth/logout-button"
 
@@ -11,9 +12,10 @@ export default async function ProfilePage() {
   const session = await getSession()
   if (!session) redirect("/login")
 
-  const [workspaces, stats] = await Promise.all([
+  const [workspaces, stats, unreadCount] = await Promise.all([
     getUserWorkspaces(session.user.id),
     getProfileStats(session.user.id),
+    getUnreadNotificationCount(session.user.id),
   ])
 
   const initials = (session.user.name ?? session.user.email ?? "?").slice(0, 1).toUpperCase()
@@ -54,10 +56,35 @@ export default async function ProfilePage() {
         Account
       </div>
       <div className="mb-6 flex flex-col overflow-hidden rounded-2xl border">
+        <Link
+          href="/profile/notifications"
+          className="flex items-center justify-between border-b px-3.5 py-3 text-sm font-medium"
+        >
+          <span className="flex items-center gap-2.5">
+            <Bell className="size-4 text-muted-foreground" />
+            Notifiche
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {unreadCount}
+              </span>
+            )}
+          </span>
+          <ChevronRight className="size-3.5 text-muted-foreground" />
+        </Link>
+        <Link
+          href="/profile/help"
+          className="flex items-center justify-between px-3.5 py-3 text-sm font-medium"
+        >
+          <span className="flex items-center gap-2.5">
+            <HelpCircle className="size-4 text-muted-foreground" />
+            Aiuto e supporto
+          </span>
+          <ChevronRight className="size-3.5 text-muted-foreground" />
+        </Link>
         {workspaces.length > 0 && (
           <Link
             href={`/w/${workspaces[0].slug}/settings`}
-            className="flex items-center justify-between px-3.5 py-3 text-sm font-medium"
+            className="flex items-center justify-between border-t px-3.5 py-3 text-sm font-medium"
           >
             <span className="flex items-center gap-2.5">
               <Settings className="size-4 text-muted-foreground" />

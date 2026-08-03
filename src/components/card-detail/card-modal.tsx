@@ -29,6 +29,7 @@ import {
   createChecklistAction,
 } from "@/lib/actions/card-detail"
 import { deleteCardAction } from "@/lib/actions/cards"
+import { verifyCurrentPasswordAction } from "@/lib/actions/security"
 import { keyBetween } from "@/lib/ordering/position"
 import { CardChecklist } from "./card-checklist"
 import { CardComments } from "./card-comments"
@@ -62,6 +63,9 @@ export function CardModal({
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
+  const [deletePassword, setDeletePassword] = useState("")
+  const [deleteError, setDeleteError] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -119,10 +123,16 @@ export function CardModal({
     }
   }
 
-  async function handleDelete() {
-    if (!window.confirm("Eliminare questa card? L'operazione non è reversibile.")) return
+  async function confirmDelete() {
+    setDeleteError(false)
     setIsDeleting(true)
     try {
+      const valid = await verifyCurrentPasswordAction(deletePassword)
+      if (!valid) {
+        setDeleteError(true)
+        setIsDeleting(false)
+        return
+      }
       await deleteCardAction(cardId)
       onDeleted(cardId)
     } catch (err) {
@@ -187,7 +197,7 @@ export function CardModal({
                 variant="ghost"
                 size="icon-sm"
                 className="shrink-0 text-muted-foreground hover:text-destructive"
-                onClick={handleDelete}
+                onClick={() => setIsConfirmingDelete(true)}
                 disabled={isDeleting}
                 aria-label="Elimina card"
               >
@@ -210,7 +220,7 @@ export function CardModal({
                   variant="ghost"
                   size="icon-sm"
                   className="shrink-0 text-muted-foreground hover:text-destructive"
-                  onClick={handleDelete}
+                  onClick={() => setIsConfirmingDelete(true)}
                   disabled={isDeleting}
                   aria-label="Elimina card"
                 >
@@ -220,6 +230,49 @@ export function CardModal({
             </div>
             <DialogTitle className="sr-only">Dettaglio card</DialogTitle>
           </DialogHeader>
+        )}
+
+        {isConfirmingDelete && (
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
+            <p className="mb-2.5 text-sm font-medium text-destructive">
+              Inserisci la password del profilo per eliminare questa card.
+            </p>
+            <Input
+              type="password"
+              value={deletePassword}
+              onChange={(e) => {
+                setDeletePassword(e.target.value)
+                setDeleteError(false)
+              }}
+              placeholder="Password"
+              className="mb-2 bg-background"
+              autoFocus
+            />
+            {deleteError && (
+              <p className="mb-2 text-xs font-medium text-destructive">Password errata.</p>
+            )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setIsConfirmingDelete(false)
+                  setDeletePassword("")
+                  setDeleteError(false)
+                }}
+              >
+                Annulla
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={confirmDelete}
+                disabled={isDeleting || !deletePassword}
+              >
+                Conferma eliminazione
+              </Button>
+            </div>
+          </div>
         )}
 
             <div className="flex flex-col gap-2">
@@ -303,7 +356,7 @@ export function CardModal({
             <Separator />
 
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Commenti</span>
+              <span className="text-xs font-medium text-muted-foreground">Attività</span>
               <CardComments
                 cardId={cardId}
                 comments={detail.comments}

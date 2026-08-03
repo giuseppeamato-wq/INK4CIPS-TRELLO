@@ -2,11 +2,19 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronDown, LayoutGrid, Settings, Plus } from "lucide-react"
+import { ChevronDown, LayoutGrid, Settings, Plus, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { colorForWorkspace } from "@/lib/workspace-colors"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
 
-type WorkspaceSummary = { id: string; name: string; slug: string; role: string; driveUrl: string | null }
+type WorkspaceSummary = {
+  id: string
+  name: string
+  slug: string
+  role: string
+  driveUrl: string | null
+  coverPath?: string | null
+}
 
 function GoogleDriveIcon({ className }: { className?: string }) {
   return (
@@ -21,9 +29,11 @@ function GoogleDriveIcon({ className }: { className?: string }) {
 export function WorkspaceSidebar({
   workspaces,
   currentSlug,
+  currentUser,
 }: {
   workspaces: WorkspaceSummary[]
   currentSlug: string
+  currentUser?: { name: string; email: string; image: string | null }
 }) {
   const pathname = usePathname()
   const isSettings = pathname.endsWith("/settings")
@@ -48,11 +58,24 @@ export function WorkspaceSidebar({
             <Link
               href={`/w/${w.slug}`}
               className={cn(
-                "min-w-0 flex-1 truncate rounded-md px-2 py-1.5 text-sm hover:bg-muted",
+                "flex min-w-0 flex-1 items-center gap-2 truncate rounded-md px-2 py-1.5 text-sm hover:bg-muted",
                 w.slug === currentSlug && "bg-muted font-medium"
               )}
             >
-              {w.name}
+              {w.coverPath ? (
+                <span
+                  className="size-[22px] shrink-0 rounded-md bg-cover bg-center"
+                  style={{ backgroundImage: `url('/api/workspaces/${w.id}/cover')` }}
+                />
+              ) : (
+                <span
+                  className="flex size-[22px] shrink-0 items-center justify-center rounded-md font-heading text-[11px] font-bold text-white"
+                  style={{ backgroundColor: colorForWorkspace(w.id) }}
+                >
+                  {w.name.slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <span className="truncate">{w.name}</span>
             </Link>
             {w.driveUrl && (
               <a
@@ -101,6 +124,25 @@ export function WorkspaceSidebar({
           Impostazioni
         </Link>
       </div>
+
+      {currentUser && (
+        <Link
+          href="/profile"
+          className="mt-auto flex items-center gap-2.5 rounded-xl bg-muted/60 p-2.5 hover:bg-muted"
+        >
+          {currentUser.image ? (
+            <img src={currentUser.image} alt="" className="size-8 shrink-0 rounded-full object-cover" />
+          ) : (
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
+              <User className="size-4" />
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13px] font-semibold">{currentUser.name}</div>
+            <div className="truncate text-[11px] text-muted-foreground">{currentUser.email}</div>
+          </div>
+        </Link>
+      )}
     </>
   )
 
@@ -123,7 +165,7 @@ export function WorkspaceSidebar({
       )}
 
       {/* Desktop: static sidebar */}
-      <aside className="hidden w-60 shrink-0 flex-col gap-4 border-r p-4 md:flex">{content}</aside>
+      <aside className="hidden w-[264px] shrink-0 flex-col gap-4 border-r bg-muted/20 p-4 md:flex">{content}</aside>
     </>
   )
 }

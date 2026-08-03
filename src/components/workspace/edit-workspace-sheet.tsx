@@ -8,6 +8,7 @@ import { renameWorkspaceAction, deleteWorkspaceAction } from "@/lib/actions/work
 import { colorForWorkspace } from "@/lib/workspace-colors"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
   BottomSheet,
   BottomSheetContent,
@@ -15,6 +16,13 @@ import {
   BottomSheetTitle,
   BottomSheetTrigger,
 } from "@/components/ui/bottom-sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export function EditWorkspaceSheet({
   workspace,
@@ -111,14 +119,10 @@ export function EditWorkspaceSheet({
     }
   }
 
-  return (
-    <BottomSheet open={open} onOpenChange={onOpenChange}>
-      <BottomSheetTrigger render={trigger} />
-      <BottomSheetContent>
-        <BottomSheetHeader>
-          <BottomSheetTitle>Modifica workspace</BottomSheetTitle>
-        </BottomSheetHeader>
+  const isMobile = useIsMobile()
 
+  const body = (
+    <>
         <div className="mb-5 flex flex-col items-center gap-2.5">
           {coverPath ? (
             <div
@@ -208,7 +212,32 @@ export function EditWorkspaceSheet({
             Elimina workspace
           </button>
         )}
-      </BottomSheetContent>
-    </BottomSheet>
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={open} onOpenChange={onOpenChange}>
+        <BottomSheetTrigger render={trigger} />
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle>Modifica workspace</BottomSheetTitle>
+          </BottomSheetHeader>
+          {body}
+        </BottomSheetContent>
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger render={trigger} />
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Modifica workspace</DialogTitle>
+        </DialogHeader>
+        {body}
+      </DialogContent>
+    </Dialog>
   )
 }

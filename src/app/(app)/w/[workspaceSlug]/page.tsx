@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth/session"
 import { getMyRoleInWorkspace, getWorkspaceBySlug } from "@/lib/queries/workspaces"
 import { getBoardsForWorkspace } from "@/lib/queries/boards"
 import { CreateBoardDialog } from "@/components/workspace/create-board-dialog"
-import { BoardCard } from "@/components/workspace/board-card"
+import { WorkspaceBoardsGrid } from "@/components/workspace/workspace-boards-grid"
 
 export default async function WorkspaceBoardsPage({
   params,
@@ -34,23 +34,12 @@ export default async function WorkspaceBoardsPage({
         </div>
       </div>
 
-      {boards.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Nessuna board ancora. Creane una per iniziare a organizzare il lavoro.
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 pb-20 sm:grid-cols-3 md:gap-4 md:pb-0 lg:grid-cols-4">
-          {boards.map((board) => (
-            <BoardCard
-              key={board.id}
-              board={board}
-              workspaceSlug={workspaceSlug}
-              workspaceName={workspace.name}
-              canEdit={canEdit}
-            />
-          ))}
-        </div>
-      )}
+      <WorkspaceBoardsGrid
+        boards={boards}
+        workspaceSlug={workspaceSlug}
+        workspaceName={workspace.name}
+        canEdit={canEdit}
+      />
 
       {/* Mobile: floating actions, matching the mockup's gear + plus FABs */}
       <div className="fixed bottom-6 left-5 md:hidden">

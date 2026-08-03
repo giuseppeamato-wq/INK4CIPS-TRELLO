@@ -77,6 +77,14 @@ export function CardChecklist({
           </span>
         )}
       </div>
+      {total > 0 && (
+        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-emerald-500 transition-[width]"
+            style={{ width: `${Math.round((done / total) * 100)}%` }}
+          />
+        </div>
+      )}
       <div className="flex flex-col gap-1">
         {checklist.items.map((item) => (
           <div key={item.id} className="group flex items-center gap-2 rounded-md px-1 py-1 hover:bg-muted">
