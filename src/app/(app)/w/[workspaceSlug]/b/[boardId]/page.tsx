@@ -4,12 +4,8 @@ import { getSession } from "@/lib/auth/session"
 import { getBoardById } from "@/lib/queries/boards"
 import { getBoardContents } from "@/lib/queries/board-contents"
 import { getMyRoleInWorkspace, getWorkspaceBySlug, getWorkspaceMembers } from "@/lib/queries/workspaces"
-import { MoreHorizontal } from "lucide-react"
 import { BoardCanvas } from "@/components/board/board-canvas"
-import { BoardBackgroundPicker } from "@/components/board/board-background-picker"
-import { EditBoardSheet } from "@/components/board/edit-board-sheet"
-import { MobileBoardHeader } from "@/components/board/mobile-board-header"
-import { Button } from "@/components/ui/button"
+import { BoardHeader } from "@/components/board/board-header"
 
 export default async function BoardPage({
   params,
@@ -34,7 +30,7 @@ export default async function BoardPage({
 
   return (
     <div className="flex h-full flex-col">
-      <MobileBoardHeader
+      <BoardHeader
         board={board}
         workspaceSlug={workspaceSlug}
         workspaceId={board.workspaceId}
@@ -43,32 +39,12 @@ export default async function BoardPage({
         canEdit={canEdit}
         canManageRoles={canManageRoles}
       />
-      <div className="hidden items-center gap-2 px-6 pt-6 md:flex">
-        <h1 className="font-heading text-lg font-semibold">{board.name}</h1>
-        {canEdit && (
-          <>
-            <BoardBackgroundPicker boardId={boardId} current={board.background} />
-            <EditBoardSheet
-              board={board}
-              workspaceId={board.workspaceId}
-              members={members}
-              canManageRoles={canManageRoles}
-              trigger={
-                <Button variant="outline" size="icon-sm" aria-label="Modifica progetto">
-                  <MoreHorizontal className="size-3.5" />
-                </Button>
-              }
-            />
-          </>
-        )}
-      </div>
       <Suspense fallback={null}>
         <BoardCanvas
           boardId={boardId}
           initialLists={lists}
           initialCards={cards}
           canEdit={canEdit}
-          background={board.background}
         />
       </Suspense>
     </div>

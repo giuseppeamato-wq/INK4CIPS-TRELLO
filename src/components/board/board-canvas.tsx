@@ -19,8 +19,6 @@ import { moveListAction } from "@/lib/actions/lists"
 import { moveCardAction } from "@/lib/actions/cards"
 import { keyBetween } from "@/lib/ordering/position"
 import { useBoardRealtime } from "@/lib/realtime/use-board-realtime"
-import { getBoardBackground } from "@/lib/board-backgrounds"
-import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ListColumn, type ListT } from "./list-column"
 import { CardItem, type CardT } from "./card-item"
@@ -33,13 +31,11 @@ export function BoardCanvas({
   initialLists,
   initialCards,
   canEdit,
-  background,
 }: {
   boardId: string
   initialLists: ListT[]
   initialCards: CardT[]
   canEdit: boolean
-  background?: string | null
 }) {
   const [lists, setLists] = useState(initialLists)
   const [cards, setCards] = useState(initialCards)
@@ -267,7 +263,7 @@ export function BoardCanvas({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className={cn("flex h-full gap-3 overflow-x-auto p-6", getBoardBackground(background).className)}>
+      <div className="flex h-full gap-3 overflow-x-auto bg-muted/30 p-6">
         <SortableContext items={sortedLists.map((l) => l.id)} strategy={horizontalListSortingStrategy}>
           {sortedLists.map((list) => (
             <ListColumn
