@@ -23,27 +23,27 @@ const FAQ = [
 export default function HelpPage() {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-1 flex-col p-5">
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3.5">
         <Link
           href="/profile"
           aria-label="Torna al profilo"
-          className="flex size-9 items-center justify-center rounded-lg bg-muted"
+          className="flex size-9 items-center justify-center rounded-[9px] bg-ink-soft"
         >
-          <ChevronLeft className="size-4" />
+          <ChevronLeft className="size-4 text-foreground" />
         </Link>
-        <h1 className="font-heading text-lg font-bold">Aiuto e supporto</h1>
+        <h1 className="font-heading text-[19px] font-bold text-foreground">Aiuto e supporto</h1>
       </div>
 
       <div className="mb-6 flex flex-col gap-3">
         {FAQ.map((item) => (
-          <div key={item.q} className="rounded-2xl border p-4">
-            <div className="mb-1.5 text-sm font-semibold">{item.q}</div>
+          <div key={item.q} className="rounded-2xl border border-border p-4">
+            <div className="mb-1.5 text-sm font-semibold text-foreground">{item.q}</div>
             <div className="text-sm text-muted-foreground">{item.a}</div>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl border bg-muted/40 p-4 text-sm">
+      <div className="rounded-2xl border border-border bg-ink-soft p-4 text-sm text-foreground">
         Per problemi non risolti da questa pagina, contatta chi amministra il tuo workspace
         o l&apos;owner del progetto INK4CIPS.
       </div>

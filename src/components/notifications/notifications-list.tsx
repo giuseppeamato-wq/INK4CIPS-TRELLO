@@ -31,12 +31,12 @@ export function NotificationsList({
           type="button"
           onClick={() => n.url && router.push(n.url)}
           className={cn(
-            "flex flex-col gap-0.5 rounded-xl border p-3.5 text-left",
-            !n.isRead && "bg-muted"
+            "rounded-[12px] border border-border p-3.5 text-left text-[13.5px] text-foreground",
+            !n.isRead && "bg-ink-soft"
           )}
         >
-          <span className="text-sm">{n.message}</span>
-          <span className="text-xs text-muted-foreground">
+          {n.message}
+          <span className="mt-0.5 block text-xs text-ink-faint">
             {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: it })}
           </span>
         </button>

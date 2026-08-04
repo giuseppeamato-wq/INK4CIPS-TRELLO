@@ -39,6 +39,13 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-ink-faint: var(--color-ink-faint);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-canvas: var(--color-ink-canvas);
+  --color-status-todo: var(--color-status-todo);
+  --color-status-progress: var(--color-status-progress);
+  --color-status-progress-dot: var(--color-status-progress-dot);
+  --color-status-done: var(--color-status-done);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,38 +56,55 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* Exact literal values from the reference design (Trello Desktop.dc.html) —
+     kept as hex, not approximated to the nearest oklch/gray step, so every
+     shadcn primitive built on these tokens (Button, Input, Dialog, Avatar,
+     Badge, Select, Popover, Checkbox…) matches the mock by default. */
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #1a1a1a;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f7f7f7;
+  --muted-foreground: #8a8a8a;
+  --accent: #f2f2f2;
+  --accent-foreground: #1a1a1a;
+  --destructive: #ef4444;
+  --border: #ececec;
+  --input: #e5e5e5;
+  --ring: #a3a3a3;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #fafafa;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #1a1a1a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2f2f2;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #ececec;
+  --sidebar-ring: #a3a3a3;
+
+  /* Design-specific surfaces that don't map to a shadcn semantic slot:
+     the softer #f7f7f7 fill used for search boxes, stat tiles and the
+     sidebar profile row (distinct from --muted's #f7f7f7... see below),
+     the faint #a3a3a3 placeholder/secondary-label tone, and the kanban
+     status colors used verbatim throughout the board view. */
+  --color-ink-faint: #a3a3a3;
+  --color-ink-soft: #f7f7f7;
+  --color-ink-canvas: #e8e8e8;
+  --color-status-todo: #ef4444;
+  --color-status-progress: #eab308;
+  --color-status-progress-dot: #facc15;
+  --color-status-done: #22c55e;
 }
 
 .dark {

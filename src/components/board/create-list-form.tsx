@@ -45,7 +45,7 @@ export function CreateListForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex w-72 shrink-0 items-center gap-1.5 rounded-lg bg-muted/50 px-3 py-2.5 text-left text-sm text-muted-foreground hover:bg-muted"
+        className="flex w-[320px] shrink-0 items-center gap-1.5 self-start rounded-xl border-[1.5px] border-dashed border-[#dcdcdc] px-3 py-2.5 text-left text-[12.5px] font-semibold text-ink-faint"
       >
         <Plus className="size-3.5" />
         Aggiungi lista
@@ -54,7 +54,7 @@ export function CreateListForm({
   }
 
   return (
-    <div className="flex w-72 shrink-0 flex-col gap-2 rounded-lg bg-muted/50 p-2.5">
+    <div className="flex w-[320px] shrink-0 flex-col gap-2 rounded-xl border border-border bg-white p-2.5">
       <Input
         autoFocus
         value={name}

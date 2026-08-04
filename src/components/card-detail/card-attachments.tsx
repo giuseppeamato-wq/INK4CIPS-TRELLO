@@ -61,14 +61,14 @@ export function CardAttachments({
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-1.5">
         {attachments.map((a) => (
-          <div key={a.id} className="flex items-center gap-2 rounded-md border p-2 text-sm">
-            <Paperclip className="size-3.5 shrink-0 text-muted-foreground" />
-            <span className="flex-1 truncate">{a.fileName}</span>
-            <span className="text-xs text-muted-foreground">{formatSize(a.sizeBytes)}</span>
-            <a href={`/api/attachments/${a.id}`} download className="text-muted-foreground hover:text-foreground">
+          <div key={a.id} className="flex items-center gap-2 rounded-[10px] border border-border p-2 text-sm">
+            <Paperclip className="size-3.5 shrink-0 text-ink-faint" />
+            <span className="flex-1 truncate text-foreground">{a.fileName}</span>
+            <span className="text-xs text-ink-faint">{formatSize(a.sizeBytes)}</span>
+            <a href={`/api/attachments/${a.id}`} download className="text-ink-faint hover:text-foreground">
               <Download className="size-3.5" />
             </a>
-            <button onClick={() => handleDelete(a.id)} className="text-muted-foreground hover:text-destructive">
+            <button onClick={() => handleDelete(a.id)} className="text-ink-faint hover:text-destructive">
               <Trash2 className="size-3.5" />
             </button>
           </div>
@@ -78,7 +78,7 @@ export function CardAttachments({
       <Button
         size="sm"
         variant="outline"
-        className="w-fit"
+        className="w-fit rounded-lg"
         disabled={isUploading}
         onClick={() => fileInputRef.current?.click()}
       >

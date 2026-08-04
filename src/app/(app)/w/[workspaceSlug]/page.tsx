@@ -26,21 +26,18 @@ export default async function WorkspaceBoardsPage({
   const canEdit = myRole === "owner" || myRole === "admin" || myRole === "editor"
 
   return (
-    <div className="relative flex flex-1 flex-col gap-6 p-5 md:p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="hidden text-xs font-medium text-muted-foreground md:block">Workspace</div>
-          <h1 className="font-heading text-lg font-semibold md:text-2xl md:font-extrabold">
-            {workspace.name}
-          </h1>
-        </div>
-        <div className="hidden md:block">
-          <CreateBoardDialog workspaceId={workspace.id} />
-        </div>
+    <div className="relative flex flex-1 flex-col gap-2 p-5 md:gap-0 md:p-0">
+      {/* Mobile-only title; desktop renders its own header inside the grid
+          component so the search box and "Nuovo board" button can sit on
+          the same row as the title, matching the design exactly. */}
+      <div className="md:hidden">
+        <div className="text-xs font-medium text-muted-foreground">Workspace</div>
+        <h1 className="font-heading text-lg font-semibold">{workspace.name}</h1>
       </div>
 
       <WorkspaceBoardsGrid
         boards={boards}
+        workspaceId={workspace.id}
         workspaceSlug={workspaceSlug}
         workspaceName={workspace.name}
         canEdit={canEdit}

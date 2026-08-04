@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Inter, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { RegisterServiceWorker } from "@/components/register-service-worker";
 
-const geistSans = Geist({
+// Inter + Montserrat, matching the design system exactly (Trello Desktop.dc.html
+// loads the same pair from Google Fonts: Inter 400/500/600 for body, Montserrat
+// 600/700/800 for headings).
+const inter = Inter({
   variable: "--font-geist-sans",
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
 });
 
@@ -16,6 +20,7 @@ const geistMono = Geist_Mono({
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
+  weight: ["600", "700", "800"],
   subsets: ["latin"],
 });
 
@@ -52,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="it"
-      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

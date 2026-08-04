@@ -30,7 +30,7 @@ export function BoardHeader({
   return (
     <div
       className={cn(
-        "relative flex items-center justify-between gap-3 p-4 pb-5 md:px-9 md:py-6",
+        "relative flex items-center justify-between gap-3 p-4 pb-5 md:px-9 md:pt-6 md:pb-5",
         getBoardBackground(board.background).className
       )}
     >
@@ -38,7 +38,7 @@ export function BoardHeader({
         <Link
           href={`/w/${workspaceSlug}`}
           aria-label="Torna al workspace"
-          className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-white/20 md:size-9"
+          className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-white/[0.22] md:size-9"
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
             <path
@@ -57,7 +57,7 @@ export function BoardHeader({
           <div className="text-xs text-white/85">{workspaceName}</div>
         </div>
         <div className="hidden min-w-0 md:block">
-          <div className="truncate font-heading text-2xl font-extrabold text-white [text-shadow:0_1px_6px_rgb(0_0_0_/_0.2)]">
+          <div className="truncate font-heading text-[22px] font-extrabold text-white [text-shadow:0_1px_6px_rgb(0_0_0_/_0.2)]">
             {board.name}
           </div>
           <div className="mt-0.5 truncate text-xs text-white/85">{workspaceName}</div>
@@ -73,7 +73,7 @@ export function BoardHeader({
             <button
               type="button"
               aria-label="Modifica progetto"
-              className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-white/20 md:size-9"
+              className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-white/[0.22] md:size-9"
             >
               <MoreHorizontal className="size-4 text-white" />
             </button>

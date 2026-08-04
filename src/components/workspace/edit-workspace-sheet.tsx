@@ -2,11 +2,11 @@
 
 import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { toast } from "sonner"
 
 import { renameWorkspaceAction, deleteWorkspaceAction } from "@/lib/actions/workspaces"
 import { colorForWorkspace } from "@/lib/workspace-colors"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -28,7 +28,7 @@ export function EditWorkspaceSheet({
   workspace,
   trigger,
 }: {
-  workspace: { id: string; name: string; coverPath?: string | null }
+  workspace: { id: string; name: string; coverPath?: string | null; slug?: string; role?: string }
   trigger: React.ReactElement
 }) {
   const router = useRouter()
@@ -121,9 +121,11 @@ export function EditWorkspaceSheet({
 
   const isMobile = useIsMobile()
 
+  const canManageMembers = workspace.role === "owner" || workspace.role === "admin"
+
   const body = (
     <>
-        <div className="mb-5 flex flex-col items-center gap-2.5">
+        <div className="mb-[22px] flex flex-col items-center gap-2.5">
           {coverPath ? (
             <div
               className="size-[72px] rounded-2xl bg-cover bg-center"
@@ -143,7 +145,7 @@ export function EditWorkspaceSheet({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploadingCover}
-            className="text-xs font-semibold text-muted-foreground"
+            className="text-xs font-semibold text-ink-faint"
           >
             Cambia copertina
           </button>
@@ -166,48 +168,70 @@ export function EditWorkspaceSheet({
           />
         </div>
 
-        <div className="flex flex-col gap-2 pb-5">
-          <label className="text-xs font-medium">Nome workspace</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        <div className="mb-5 flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-foreground">Nome workspace</label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-11 rounded-[10px] border-[#e5e5e5] bg-[#fafafa] px-3.5 text-sm"
+          />
         </div>
 
-        <div className="flex gap-2.5 pb-4">
-          <Button variant="secondary" className="flex-1" onClick={() => setOpen(false)}>
+        {canManageMembers && workspace.slug && (
+          <Link
+            href={`/w/${workspace.slug}/settings`}
+            className="mb-5 -mt-2.5 block text-xs font-semibold text-ink-faint"
+          >
+            Gestisci membri e inviti →
+          </Link>
+        )}
+
+        <div className="mb-4 flex gap-2.5">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex-1 rounded-[10px] bg-[#f2f2f2] py-3 text-center text-sm font-semibold text-foreground"
+          >
             Annulla
-          </Button>
-          <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="flex-1 rounded-[10px] bg-[#1a1a1a] py-3 text-center text-sm font-semibold text-white disabled:opacity-50"
+          >
             Salva
-          </Button>
+          </button>
         </div>
 
         {confirmingDelete ? (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
-            <p className="mb-2.5 text-sm font-medium text-destructive">
+          <div className="rounded-xl border border-[#f3d4d4] bg-[#fef2f2] p-3.5">
+            <p className="mb-2.5 text-[13px] font-semibold text-[#991b1b]">
               Eliminare questo workspace e i suoi board? L&apos;azione non è reversibile.
             </p>
             <div className="flex gap-2.5">
-              <Button
-                variant="outline"
-                className="flex-1"
+              <button
+                type="button"
                 onClick={() => setConfirmingDelete(false)}
+                className="flex-1 rounded-[10px] border border-[#f3d4d4] bg-white py-2.5 text-center text-[13px] font-semibold text-foreground"
               >
                 Annulla
-              </Button>
-              <Button
-                variant="destructive"
-                className="flex-1"
+              </button>
+              <button
+                type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
+                className="flex-1 rounded-[10px] bg-destructive py-2.5 text-center text-[13px] font-semibold text-white disabled:opacity-50"
               >
                 Elimina
-              </Button>
+              </button>
             </div>
           </div>
         ) : (
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="w-full rounded-xl border border-destructive/30 py-3 text-sm font-medium text-destructive"
+            className="w-full rounded-[10px] border border-[#f3d4d4] py-3 text-center text-[13.5px] font-semibold text-destructive"
           >
             Elimina workspace
           </button>
@@ -232,9 +256,11 @@ export function EditWorkspaceSheet({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger render={trigger} />
-      <DialogContent className="max-w-md">
+      <DialogContent showCloseButton={false} className="w-full max-w-[420px] rounded-2xl p-6">
         <DialogHeader>
-          <DialogTitle>Modifica workspace</DialogTitle>
+          <DialogTitle className="mb-1 font-heading text-base font-bold text-foreground">
+            Modifica workspace
+          </DialogTitle>
         </DialogHeader>
         {body}
       </DialogContent>

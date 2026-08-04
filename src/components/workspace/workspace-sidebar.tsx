@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronDown, LayoutGrid, MoreHorizontal, Settings, Plus, User } from "lucide-react"
+import { ChevronDown, MoreHorizontal, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { colorForWorkspace } from "@/lib/workspace-colors"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
@@ -17,27 +17,21 @@ type WorkspaceSummary = {
   coverPath?: string | null
 }
 
-function GoogleDriveIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <polygon points="8.5,3 15.5,3 22,14.5 15,14.5" fill="#FFC107" />
-      <polygon points="2,14.5 8.5,3 15,14.5 8.5,21.5" fill="#4285F4" />
-      <polygon points="8.5,21.5 15,14.5 22,14.5 15.5,21.5" fill="#34A853" />
-    </svg>
-  )
-}
-
 export function WorkspaceSidebar({
   workspaces,
-  currentSlug,
+  currentSlug = "",
   currentUser,
+  hideMobileBar = false,
 }: {
   workspaces: WorkspaceSummary[]
-  currentSlug: string
+  currentSlug?: string
   currentUser?: { name: string; email: string; image: string | null }
+  // Pages outside the workspace shell (profile and its subpages) already
+  // get a mobile top bar from AppHeader — the workspace-switcher bar below
+  // would just duplicate it, so callers there opt out of it.
+  hideMobileBar?: boolean
 }) {
   const pathname = usePathname()
-  const isSettings = pathname.endsWith("/settings")
   // A board's own gradient header already provides back-navigation and
   // context, so the plain workspace bar would just duplicate it on mobile.
   const isBoardDetail = /\/b\/[^/]+$/.test(pathname)
@@ -45,50 +39,41 @@ export function WorkspaceSidebar({
 
   const content = (
     <>
-      <Link href="/" className="flex items-center gap-2 px-2">
-        <img src="/logo.png" alt="INK4CIPS" className="size-7 rounded-md" />
-        <span className="truncate font-heading text-sm font-semibold">INK4CIPS</span>
-      </Link>
+      <div className="flex items-center gap-2.5 px-2 pt-1 pb-1">
+        <span className="font-heading text-[15px] font-extrabold text-foreground">INK4CIPS</span>
+      </div>
 
-      <div className="flex flex-col gap-1">
-        <span className="px-2 text-xs font-medium text-muted-foreground">
+      <div className="flex flex-col px-0.5">
+        <span className="px-2.5 py-1.5 text-[11px] font-bold tracking-[0.05em] text-ink-faint uppercase">
           Workspace
         </span>
         {workspaces.map((w) => (
-          <div key={w.id} className="flex items-center gap-1">
+          <div
+            key={w.id}
+            className={cn(
+              "flex items-center gap-2.5 rounded-[9px] py-2 pr-2 pl-2.5",
+              w.slug === currentSlug && "bg-[#f2f2f2]"
+            )}
+          >
             <Link
               href={`/w/${w.slug}`}
-              className={cn(
-                "flex min-w-0 flex-1 items-center gap-2 truncate rounded-md px-2 py-1.5 text-sm hover:bg-muted",
-                w.slug === currentSlug && "bg-muted font-medium"
-              )}
+              className="flex min-w-0 flex-1 items-center gap-2.5"
             >
               {w.coverPath ? (
                 <span
-                  className="size-[22px] shrink-0 rounded-md bg-cover bg-center"
+                  className="size-[26px] shrink-0 rounded-[7px] bg-cover bg-center"
                   style={{ backgroundImage: `url('/api/workspaces/${w.id}/cover')` }}
                 />
               ) : (
                 <span
-                  className="flex size-[22px] shrink-0 items-center justify-center rounded-md font-heading text-[11px] font-bold text-white"
+                  className="flex size-[26px] shrink-0 items-center justify-center rounded-[7px] font-heading text-[11px] font-bold text-white"
                   style={{ backgroundColor: colorForWorkspace(w.id) }}
                 >
                   {w.name.slice(0, 1).toUpperCase()}
                 </span>
               )}
-              <span className="truncate">{w.name}</span>
+              <span className="truncate text-[13px] font-semibold text-foreground">{w.name}</span>
             </Link>
-            {w.driveUrl && (
-              <a
-                href={w.driveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 rounded-md p-1 hover:bg-muted"
-                aria-label={`Apri Google Drive di ${w.name}`}
-              >
-                <GoogleDriveIcon className="size-4" />
-              </a>
-            )}
             {(w.role === "owner" || w.role === "admin") && (
               <EditWorkspaceSheet
                 workspace={w}
@@ -96,7 +81,7 @@ export function WorkspaceSidebar({
                   <button
                     type="button"
                     aria-label={`Modifica ${w.name}`}
-                    className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className="flex size-[22px] shrink-0 items-center justify-center rounded-md text-ink-faint hover:bg-[#ececec]"
                   >
                     <MoreHorizontal className="size-3.5" />
                   </button>
@@ -105,59 +90,48 @@ export function WorkspaceSidebar({
             )}
           </div>
         ))}
-        <div className="mt-1 px-2">
-          <CreateWorkspaceDialog
-            trigger={
-              <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-                <span className="flex size-[22px] shrink-0 items-center justify-center rounded-md bg-muted">
-                  <Plus className="size-3" />
-                </span>
-                Nuovo workspace
-              </button>
-            }
-          />
-        </div>
+        <CreateWorkspaceDialog
+          trigger={
+            <button className="mt-0.5 flex items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left">
+              <span className="flex size-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[#f0f0f0]">
+                <Plus className="size-[13px] text-muted-foreground" strokeWidth={2.2} />
+              </span>
+              <span className="text-[12.5px] font-semibold text-muted-foreground">Nuovo workspace</span>
+            </button>
+          }
+        />
       </div>
 
-      <div className="flex flex-col gap-1 border-t pt-4">
-        <Link
-          href={`/w/${currentSlug}`}
-          className={cn(
-            "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted",
-            !isSettings && "bg-muted font-medium"
-          )}
-        >
-          <LayoutGrid className="size-4" />
-          Board
-        </Link>
-        <Link
-          href={`/w/${currentSlug}/settings`}
-          className={cn(
-            "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted",
-            isSettings && "bg-muted font-medium"
-          )}
-        >
-          <Settings className="size-4" />
-          Impostazioni
-        </Link>
-      </div>
+      <div className="flex-1" />
 
       {currentUser && (
         <Link
           href="/profile"
-          className="mt-auto flex items-center gap-2.5 rounded-xl bg-muted/60 p-2.5 hover:bg-muted"
+          className="mx-3.5 mb-3.5 flex items-center gap-2.5 rounded-xl bg-ink-soft p-2.5"
         >
-          {currentUser.image ? (
-            <img src={currentUser.image} alt="" className="size-8 shrink-0 rounded-full object-cover" />
-          ) : (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
-              <User className="size-4" />
-            </span>
-          )}
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[13px] font-semibold">{currentUser.name}</div>
-            <div className="truncate text-[11px] text-muted-foreground">{currentUser.email}</div>
-          </div>
+          <span
+            className="size-8 shrink-0 rounded-full bg-cover bg-center"
+            style={
+              currentUser.image
+                ? { backgroundImage: `url('${currentUser.image}')` }
+                : { backgroundColor: "#1a1a1a" }
+            }
+          >
+            {!currentUser.image && (
+              <span className="flex size-full items-center justify-center font-heading text-xs font-bold text-white">
+                {currentUser.name.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+          </span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" className="shrink-0">
+            <path
+              d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.5 1h.1a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"
+              stroke="#5a5a5a"
+              strokeWidth="1.4"
+            />
+            <circle cx="12" cy="12" r="3" stroke="#5a5a5a" strokeWidth="1.6" />
+          </svg>
+          <span className="flex-1 text-[12.5px] font-semibold text-foreground">Impostazioni</span>
         </Link>
       )}
     </>
@@ -166,7 +140,7 @@ export function WorkspaceSidebar({
   return (
     <>
       {/* Mobile: static bar linking to the full-screen workspace switcher */}
-      {!isBoardDetail && (
+      {!isBoardDetail && !hideMobileBar && (
         <Link
           href="/w"
           className="flex items-center justify-between border-b px-4 py-2.5 md:hidden"
@@ -181,8 +155,10 @@ export function WorkspaceSidebar({
         </Link>
       )}
 
-      {/* Desktop: static sidebar */}
-      <aside className="hidden w-[264px] shrink-0 flex-col gap-4 border-r bg-muted/20 p-4 md:flex">{content}</aside>
+      {/* Desktop: static sidebar, matching the design system exactly */}
+      <aside className="hidden w-[264px] shrink-0 flex-col border-r border-border bg-sidebar pt-3 md:flex">
+        {content}
+      </aside>
     </>
   )
 }

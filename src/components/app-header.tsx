@@ -7,11 +7,11 @@ import { LogoutButton } from "@/components/auth/logout-button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { NotificationBell, type NotificationT } from "@/components/notifications/notification-bell"
 
-// Workspace/board pages already render their own branded sidebar (logo,
-// nav, profile row), so this bar would just duplicate it on desktop — it
-// only needs to show there on mobile, which has no sidebar. Pages outside
-// the workspace shell (profile, home) still get the full desktop bar since
-// they have no other way back to a workspace or to log out.
+// Workspace/board/profile pages already render their own branded sidebar
+// (logo, nav, profile row), so this bar would just duplicate it on desktop —
+// it only needs to show there on mobile, which has no sidebar. Pages with no
+// sidebar of their own (e.g. the "/" workspace picker) still get the full
+// desktop bar since they have no other way back to a workspace or to log out.
 export function AppHeader({
   userEmail,
   userLabel,
@@ -24,7 +24,7 @@ export function AppHeader({
   unreadCount: number
 }) {
   const pathname = usePathname()
-  const isWorkspaceShell = pathname.startsWith("/w/")
+  const isWorkspaceShell = pathname.startsWith("/w/") || pathname.startsWith("/profile")
 
   return (
     <header
@@ -38,7 +38,7 @@ export function AppHeader({
       </Link>
       <div className="hidden items-center gap-3 md:flex">
         <span className="truncate text-sm text-muted-foreground">{userEmail}</span>
-        <LogoutButton />
+        <LogoutButton compact />
       </div>
       <div className="flex items-center gap-2.5 md:hidden">
         <NotificationBell initialNotifications={notifications} initialUnreadCount={unreadCount} />

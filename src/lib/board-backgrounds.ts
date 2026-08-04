@@ -4,14 +4,16 @@ export type BoardBackground = {
   className: string
 }
 
+// Exact literal gradients from the reference design's GRADIENTS map
+// (Trello Desktop.dc.html), not the nearest Tailwind palette stop.
 export const BOARD_BACKGROUNDS: BoardBackground[] = [
-  { id: "neutral", label: "Neutro", className: "bg-muted" },
-  { id: "ocean", label: "Oceano", className: "bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700" },
-  { id: "sunset", label: "Tramonto", className: "bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600" },
-  { id: "forest", label: "Foresta", className: "bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700" },
-  { id: "berry", label: "Bacca", className: "bg-gradient-to-br from-fuchsia-500 via-purple-600 to-indigo-800" },
-  { id: "citrus", label: "Agrumi", className: "bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500" },
-  { id: "slate", label: "Ardesia", className: "bg-gradient-to-br from-slate-600 via-slate-800 to-black" },
+  { id: "neutral", label: "Neutro", className: "bg-[#f2f2f2]" },
+  { id: "ocean", label: "Oceano", className: "bg-[linear-gradient(135deg,#0ea5e9,#2563eb,#4338ca)]" },
+  { id: "sunset", label: "Tramonto", className: "bg-[linear-gradient(135deg,#fb923c,#ec4899,#9333ea)]" },
+  { id: "forest", label: "Foresta", className: "bg-[linear-gradient(135deg,#10b981,#0d9488,#0e7490)]" },
+  { id: "berry", label: "Bacca", className: "bg-[linear-gradient(135deg,#d946ef,#9333ea,#3730a3)]" },
+  { id: "citrus", label: "Agrumi", className: "bg-[linear-gradient(135deg,#facc15,#f97316,#ef4444)]" },
+  { id: "slate", label: "Ardesia", className: "bg-[linear-gradient(135deg,#475569,#1e293b,#000000)]" },
 ]
 
 export const DEFAULT_BOARD_BACKGROUND_ID = "neutral"

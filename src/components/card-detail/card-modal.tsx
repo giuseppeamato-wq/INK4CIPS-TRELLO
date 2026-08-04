@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Plus, Trash2, X } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import {
@@ -16,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { LIST_KIND_INFO, type ListKind } from "@/lib/list-kinds"
@@ -32,7 +30,7 @@ import { deleteCardAction } from "@/lib/actions/cards"
 import { verifyCurrentPasswordAction } from "@/lib/actions/security"
 import { keyBetween } from "@/lib/ordering/position"
 import { CardChecklist } from "./card-checklist"
-import { CardComments } from "./card-comments"
+import { CardCommentComposer, CardCommentsList } from "./card-comments"
 import { CardMembersPopover } from "./card-members-popover"
 import { CardLabelsPopover } from "./card-labels-popover"
 import { CardAttachments } from "./card-attachments"
@@ -153,241 +151,235 @@ export function CardModal({
     }
   }
 
-  const header = isMobile ? (
-    <div className="mb-1 flex items-center justify-between">
-      {cardKind ? (
-        <span
-          className={cn(
-            "text-[11px] font-bold tracking-wide uppercase",
-            LIST_KIND_INFO[cardKind].textClassName
-          )}
+  if (loading || !detail) {
+    return isMobile ? (
+      <BottomSheet open onOpenChange={onOpenChange}>
+        <BottomSheetContent>
+          <div className="p-8 text-center text-sm text-ink-faint">Caricamento...</div>
+        </BottomSheetContent>
+      </BottomSheet>
+    ) : (
+      <Dialog open onOpenChange={onOpenChange}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-full max-w-[640px] rounded-2xl border-none p-0 shadow-none ring-0"
         >
-          {LIST_KIND_INFO[cardKind].name}
-        </span>
-      ) : (
-        <span />
+          <DialogTitle className="sr-only">Caricamento card</DialogTitle>
+          <div className="p-8 text-center text-sm text-ink-faint">Caricamento...</div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  const kindLabel = cardKind && (
+    <span className={cn("text-[11px] font-bold tracking-[0.04em] uppercase", LIST_KIND_INFO[cardKind].textClassName)}>
+      {LIST_KIND_INFO[cardKind].name}
+    </span>
+  )
+
+  const titleRow = (
+    <div className="mb-3.5 flex items-start justify-between gap-2">
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        onBlur={saveTitle}
+        readOnly={!canEdit}
+        className="h-auto flex-1 border-none px-0 font-heading text-[21px] font-extrabold text-foreground shadow-none focus-visible:ring-0 read-only:cursor-default"
+      />
+      {canEdit && (
+        <button
+          type="button"
+          onClick={() => setIsConfirmingDelete(true)}
+          disabled={isDeleting}
+          aria-label="Elimina card"
+          className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#f2f2f2] text-[#5a5a5a]"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
       )}
-      <button
-        onClick={() => onOpenChange(false)}
-        aria-label="Chiudi"
-        className="flex size-7 items-center justify-center rounded-full bg-muted"
-      >
-        <X className="size-3.5" />
-      </button>
+    </div>
+  )
+
+  const deleteBlock = isConfirmingDelete ? (
+    <div className="mb-4 rounded-xl border border-[#f3d4d4] bg-[#fef2f2] p-3.5">
+      <p className="mb-2.5 text-[13px] font-semibold text-[#991b1b]">
+        Inserisci la password del profilo per eliminare questa card.
+      </p>
+      <Input
+        type="password"
+        value={deletePassword}
+        onChange={(e) => {
+          setDeletePassword(e.target.value)
+          setDeleteError(false)
+        }}
+        placeholder="Password"
+        className="mb-2 h-10 rounded-[9px] border-[#f3d4d4] bg-white"
+        autoFocus
+      />
+      {deleteError && <p className="mb-2 text-xs font-semibold text-destructive">Password errata.</p>}
+      <div className="flex gap-2.5">
+        <Button
+          variant="outline"
+          className="flex-1 rounded-[9px] border-[#f3d4d4] bg-white"
+          onClick={() => {
+            setIsConfirmingDelete(false)
+            setDeletePassword("")
+            setDeleteError(false)
+          }}
+        >
+          Annulla
+        </Button>
+        <Button
+          variant="destructive"
+          className="flex-1 rounded-[9px] bg-destructive text-white hover:bg-destructive/90"
+          onClick={confirmDelete}
+          disabled={isDeleting || !deletePassword}
+        >
+          Conferma eliminazione
+        </Button>
+      </div>
     </div>
   ) : null
 
-  const body =
-    loading || !detail ? (
-      <div className="p-8 text-center text-sm text-muted-foreground">Caricamento...</div>
-    ) : (
-      <div className="flex flex-col gap-5">
-        {header}
-        {isMobile ? (
-          <div className="flex items-start justify-between gap-2">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onBlur={saveTitle}
-              readOnly={!canEdit}
-              className="border-none px-0 font-heading text-lg font-extrabold shadow-none focus-visible:ring-0 read-only:cursor-default"
-            />
-            {canEdit && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="shrink-0 text-muted-foreground hover:text-destructive"
-                onClick={() => setIsConfirmingDelete(true)}
-                disabled={isDeleting}
-                aria-label="Elimina card"
-              >
-                <Trash2 className="size-4" />
-              </Button>
-            )}
-          </div>
-        ) : (
-          <DialogHeader>
-            {cardKind && (
-              <span
-                className={cn(
-                  "text-[11px] font-bold tracking-wide uppercase",
-                  LIST_KIND_INFO[cardKind].textClassName
-                )}
-              >
-                {LIST_KIND_INFO[cardKind].name}
-              </span>
-            )}
-            <div className="flex items-center gap-2 pr-6">
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onBlur={saveTitle}
-                readOnly={!canEdit}
-                className="border-none px-0 text-base font-semibold shadow-none focus-visible:ring-0 read-only:cursor-default"
-              />
-              {canEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
-                  onClick={() => setIsConfirmingDelete(true)}
-                  disabled={isDeleting}
-                  aria-label="Elimina card"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              )}
-            </div>
-            <DialogTitle className="sr-only">Dettaglio card</DialogTitle>
-          </DialogHeader>
-        )}
+  const body = (
+    <div className="flex flex-col">
+      {titleRow}
+      {deleteBlock}
 
-        {isConfirmingDelete && (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
-            <p className="mb-2.5 text-sm font-medium text-destructive">
-              Inserisci la password del profilo per eliminare questa card.
-            </p>
-            <Input
-              type="password"
-              value={deletePassword}
-              onChange={(e) => {
-                setDeletePassword(e.target.value)
-                setDeleteError(false)
-              }}
-              placeholder="Password"
-              className="mb-2 bg-background"
-              autoFocus
-            />
-            {deleteError && (
-              <p className="mb-2 text-xs font-medium text-destructive">Password errata.</p>
-            )}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => {
-                  setIsConfirmingDelete(false)
-                  setDeletePassword("")
-                  setDeleteError(false)
-                }}
-              >
-                Annulla
-              </Button>
-              <Button
-                variant="destructive"
-                className="flex-1"
-                onClick={confirmDelete}
-                disabled={isDeleting || !deletePassword}
-              >
-                Conferma eliminazione
-              </Button>
-            </div>
-          </div>
-        )}
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        <CardLabelsPopover
+          cardId={cardId}
+          boardId={boardId}
+          labels={detail.labels}
+          boardLabels={boardLabels}
+          onChange={(labels) => setDetail({ ...detail, labels })}
+          onBoardLabelsChange={setBoardLabels}
+        />
+      </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Membri</span>
-              <CardMembersPopover
-                cardId={cardId}
-                members={detail.members}
-                boardMembers={boardMembers}
-                onChange={(members) => setDetail({ ...detail, members })}
-              />
-            </div>
+      <div className="mb-4.5 flex items-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0">
+          <rect x="3" y="5" width="18" height="16" rx="3" stroke="#8a8a8a" strokeWidth="1.8" />
+          <path d="M3 9H21M8 3V6M16 3V6" stroke="#8a8a8a" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+        <span className="text-[12.5px] font-medium text-[#5a5a5a]">Scadenza:</span>
+        <input
+          type="date"
+          className="h-6 rounded-md border-none bg-transparent px-1 text-[12.5px] font-medium text-[#5a5a5a] outline-none"
+          value={detail.card.dueDate ? new Date(detail.card.dueDate).toISOString().slice(0, 10) : ""}
+          onChange={(e) => saveDueDate(e.target.value)}
+        />
+      </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Etichette</span>
-              <CardLabelsPopover
-                cardId={cardId}
-                boardId={boardId}
-                labels={detail.labels}
-                boardLabels={boardLabels}
-                onChange={(labels) => setDetail({ ...detail, labels })}
-                onBoardLabelsChange={setBoardLabels}
-              />
-            </div>
+      <div className="mb-4.5 flex flex-col gap-2">
+        <span className="text-xs font-bold tracking-[0.04em] text-foreground uppercase">Assegnatari</span>
+        <CardMembersPopover
+          cardId={cardId}
+          members={detail.members}
+          boardMembers={boardMembers}
+          onChange={(members) => setDetail({ ...detail, members })}
+        />
+      </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Scadenza</span>
-              <input
-                type="date"
-                className="h-8 w-fit rounded-lg border border-input bg-transparent px-2.5 text-sm"
-                value={detail.card.dueDate ? new Date(detail.card.dueDate).toISOString().slice(0, 10) : ""}
-                onChange={(e) => saveDueDate(e.target.value)}
-              />
-            </div>
+      <div className="mb-5 flex flex-col gap-1.5">
+        <span className="text-xs font-bold tracking-[0.04em] text-foreground uppercase">Descrizione</span>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          onBlur={saveDescription}
+          placeholder="Aggiungi una descrizione più dettagliata..."
+          className="min-h-20 resize-none border-none bg-transparent px-0 text-[13.5px] leading-[1.55] text-[#5a5a5a] shadow-none focus-visible:ring-0"
+        />
+      </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Descrizione</span>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onBlur={saveDescription}
-                placeholder="Aggiungi una descrizione più dettagliata..."
-                className="min-h-20 text-sm"
-              />
-            </div>
+      <div className="mb-5 flex flex-col gap-4 border-t border-[#f0f0f0] pt-4">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold tracking-[0.04em] text-foreground uppercase">Checklist</span>
+          <Button size="sm" variant="ghost" onClick={addChecklist}>
+            <Plus className="size-3.5" />
+            Aggiungi
+          </Button>
+        </div>
+        {detail.checklists.map((checklist) => (
+          <CardChecklist
+            key={checklist.id}
+            checklist={checklist}
+            onChange={(updated) =>
+              setDetail({
+                ...detail,
+                checklists: detail.checklists.map((c) => (c.id === updated.id ? updated : c)),
+              })
+            }
+          />
+        ))}
+      </div>
 
-            <Separator />
+      <div className="mb-5 flex flex-col gap-2 border-t border-[#f0f0f0] pt-4">
+        <span className="text-xs font-bold tracking-[0.04em] text-foreground uppercase">Allegati</span>
+        <CardAttachments
+          cardId={cardId}
+          attachments={detail.attachments}
+          onChange={(attachments) => setDetail({ ...detail, attachments })}
+        />
+      </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">Checklist</span>
-                <Button size="sm" variant="ghost" onClick={addChecklist}>
-                  <Plus className="size-3.5" />
-                  Aggiungi
-                </Button>
-              </div>
-              {detail.checklists.map((checklist) => (
-                <CardChecklist
-                  key={checklist.id}
-                  checklist={checklist}
-                  onChange={(updated) =>
-                    setDetail({
-                      ...detail,
-                      checklists: detail.checklists.map((c) => (c.id === updated.id ? updated : c)),
-                    })
-                  }
-                />
-              ))}
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Allegati</span>
-              <CardAttachments
-                cardId={cardId}
-                attachments={detail.attachments}
-                onChange={(attachments) => setDetail({ ...detail, attachments })}
-              />
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Attività</span>
-              <CardComments
-                cardId={cardId}
-                comments={detail.comments}
-                onChange={(comments) => setDetail({ ...detail, comments })}
-              />
-            </div>
-          </div>
-        )
+      <div className="flex flex-col gap-2.5 border-t border-[#f0f0f0] pt-4">
+        <span className="text-xs font-bold tracking-[0.04em] text-foreground uppercase">Attività</span>
+        <CardCommentsList comments={detail.comments} />
+      </div>
+    </div>
+  )
 
   if (isMobile) {
     return (
       <BottomSheet open onOpenChange={onOpenChange}>
-        <BottomSheetContent>{body}</BottomSheetContent>
+        <BottomSheetContent>
+          <div className="mb-1 flex items-center justify-between">
+            {kindLabel ?? <span />}
+            <button
+              onClick={() => onOpenChange(false)}
+              aria-label="Chiudi"
+              className="flex size-7 items-center justify-center rounded-full bg-[#f2f2f2]"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M5 5L19 19M19 5L5 19" stroke="#5a5a5a" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+          {body}
+        </BottomSheetContent>
+        <CardCommentComposer
+          cardId={cardId}
+          onChange={(comment) => setDetail({ ...detail, comments: [...detail.comments, comment] })}
+        />
       </BottomSheet>
     )
   }
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto sm:max-w-lg">
-        {body}
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-h-[84%] w-full max-w-[640px] flex-col gap-0 overflow-hidden rounded-2xl border-none p-0 shadow-[0_20px_60px_rgba(0,0,0,0.25)] ring-0"
+      >
+        <DialogTitle className="sr-only">Dettaglio card</DialogTitle>
+        <div className="flex items-center justify-between px-6 pt-[18px] pb-3">
+          {kindLabel ?? <span />}
+          <button
+            onClick={() => onOpenChange(false)}
+            aria-label="Chiudi"
+            className="flex size-7 items-center justify-center rounded-full bg-[#f2f2f2]"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M5 5L19 19M19 5L5 19" stroke="#5a5a5a" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 pb-6">{body}</div>
+        <CardCommentComposer
+          cardId={cardId}
+          onChange={(comment) => setDetail({ ...detail, comments: [...detail.comments, comment] })}
+        />
       </DialogContent>
     </Dialog>
   )

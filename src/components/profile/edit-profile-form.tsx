@@ -3,12 +3,11 @@
 import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Pencil } from "lucide-react"
+import { ChevronLeft, Pencil } from "lucide-react"
 import { authClient } from "@/lib/auth/client"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
 import { ChangePasswordSheet } from "./change-password-sheet"
 
 export function EditProfileForm({
@@ -87,9 +86,31 @@ export function EditProfileForm({
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col p-5">
+      <div className="mb-2 flex items-center justify-between gap-3 pb-1.5">
+        <div className="flex items-center gap-3.5">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Annulla"
+            className="flex size-9 items-center justify-center rounded-[9px] bg-ink-soft"
+          >
+            <ChevronLeft className="size-4 text-foreground" />
+          </button>
+          <span className="font-heading text-[19px] font-bold text-foreground">Modifica profilo</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={isSaving}
+          className="rounded-[9px] bg-[#1a1a1a] px-5 py-2.5 text-[13.5px] font-bold text-white disabled:opacity-50"
+        >
+          Salva
+        </button>
+      </div>
+
       <div className="mb-7 flex flex-col items-center gap-2 py-2.5">
         <div className="relative">
-          <Avatar size="lg" className="size-[84px]">
+          <Avatar size="lg" className="size-[92px]">
             {avatarUrl && <AvatarImage src={avatarUrl} alt={initialName} />}
             <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
           </Avatar>
@@ -98,9 +119,9 @@ export function EditProfileForm({
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploadingAvatar}
             aria-label="Cambia foto"
-            className="absolute -right-0.5 -bottom-0.5 flex size-7 items-center justify-center rounded-full border-2 border-background bg-muted shadow"
+            className="absolute -right-0.5 -bottom-0.5 flex size-[30px] items-center justify-center rounded-full border-2 border-white bg-white shadow-[0_2px_6px_rgba(0,0,0,0.18)]"
           >
-            <Pencil className="size-3.5" />
+            <Pencil className="size-3.5 text-foreground" />
           </button>
           <input
             ref={fileInputRef}
@@ -110,6 +131,14 @@ export function EditProfileForm({
             className="hidden"
           />
         </div>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploadingAvatar}
+          className="text-[12.5px] font-semibold text-muted-foreground"
+        >
+          Cambia foto
+        </button>
         {avatarUrl && (
           <button
             type="button"
@@ -123,49 +152,46 @@ export function EditProfileForm({
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium">Nome completo</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-foreground">Nome completo</label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+            className="h-11 rounded-[10px] border-[#e5e5e5] bg-[#fafafa] px-3.5 text-sm"
+          />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium">Email</label>
-          <Input value={email} disabled />
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-foreground">Email</label>
+          <Input value={email} disabled className="h-11 rounded-[10px] border-[#e5e5e5] bg-[#fafafa] px-3.5 text-sm" />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium">Ruolo</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-foreground">Ruolo</label>
           <Input
             value={jobTitle}
             onChange={(e) => setJobTitle(e.target.value)}
             placeholder="Es. Product Designer"
+            className="h-11 rounded-[10px] border-[#e5e5e5] bg-[#fafafa] px-3.5 text-sm"
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium">Bio</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-foreground">Bio</label>
           <Textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={3}
-            className="resize-none"
+            className="resize-none rounded-[10px] border-[#e5e5e5] bg-[#fafafa] px-3.5 py-2.5 text-sm"
           />
         </div>
       </div>
 
-      <div className="mt-7 mb-2 text-xs font-bold tracking-wide text-muted-foreground uppercase">
+      <div className="mt-7 mb-2 text-xs font-bold tracking-[0.04em] text-muted-foreground uppercase">
         Sicurezza
       </div>
       <ChangePasswordSheet />
-
-      <div className="mt-7 flex gap-2.5">
-        <Button variant="secondary" className="flex-1" onClick={() => router.back()}>
-          Annulla
-        </Button>
-        <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
-          Salva
-        </Button>
-      </div>
     </div>
   )
 }

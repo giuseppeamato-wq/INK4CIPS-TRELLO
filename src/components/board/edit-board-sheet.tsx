@@ -9,7 +9,6 @@ import { renameBoardAction, updateBoardBackgroundAction, deleteBoardAction } fro
 import { updateMemberRoleAction } from "@/lib/actions/workspaces"
 import { BOARD_BACKGROUNDS } from "@/lib/board-backgrounds"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -102,13 +101,18 @@ export function EditBoardSheet({
 
   const body = (
     <>
-        <div className="flex flex-col gap-2 pb-5">
-          <label className="text-xs font-medium">Nome progetto</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+        <div className="mb-5 flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-foreground">Nome progetto</label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+            className="h-11 rounded-[10px] border-[#e5e5e5] bg-[#fafafa] px-3.5 text-sm"
+          />
         </div>
 
-        <div className="mb-2.5 text-xs font-medium">Colore principale</div>
-        <div className="mb-5 flex flex-wrap gap-2.5">
+        <div className="mb-2.5 text-xs font-semibold text-foreground">Colore principale</div>
+        <div className="mb-[22px] flex flex-wrap gap-2.5">
           {BOARD_BACKGROUNDS.map((bg) => (
             <button
               key={bg.id}
@@ -130,26 +134,26 @@ export function EditBoardSheet({
 
         {canManageRoles && members.length > 0 && (
           <>
-            <div className="mb-2.5 text-xs font-medium">Ruoli del team</div>
-            <div className="mb-5 flex flex-col gap-2.5">
+            <div className="mb-2.5 text-xs font-semibold text-foreground">Ruoli del team</div>
+            <div className="mb-[22px] flex flex-col gap-2.5">
               {members.map((m) => {
                 const role = roles.get(m.userId)
                 if (role === "owner" || role === "admin") return null
                 return (
-                  <div key={m.userId} className="flex items-center gap-3 rounded-2xl border p-3">
+                  <div key={m.userId} className="flex items-center gap-3 rounded-[14px] border border-border p-3">
                     <div className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-secondary font-heading text-xs font-bold">
                       {(m.name ?? m.email).slice(0, 1).toUpperCase()}
                     </div>
-                    <div className="min-w-0 flex-1 truncate text-[13.5px] font-medium">
+                    <div className="min-w-0 flex-1 truncate text-[13.5px] font-medium text-foreground">
                       {m.name ?? m.email}
                     </div>
-                    <div className="flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5">
+                    <div className="flex shrink-0 gap-0.5 rounded-lg bg-[#f2f2f2] p-[3px]">
                       <button
                         type="button"
                         onClick={() => setRole(m.userId, "editor")}
                         className={cn(
                           "rounded-md px-3 py-1.5 text-[11.5px] font-bold",
-                          role === "editor" && "bg-foreground text-background"
+                          role === "editor" ? "bg-[#1a1a1a] text-white" : "text-foreground"
                         )}
                       >
                         Editor
@@ -159,7 +163,7 @@ export function EditBoardSheet({
                         onClick={() => setRole(m.userId, "member")}
                         className={cn(
                           "rounded-md px-3 py-1.5 text-[11.5px] font-bold",
-                          role === "member" && "bg-foreground text-background"
+                          role === "member" ? "bg-[#1a1a1a] text-white" : "text-foreground"
                         )}
                       >
                         Membro
@@ -172,43 +176,52 @@ export function EditBoardSheet({
           </>
         )}
 
-        <div className="flex gap-2.5 pb-4">
-          <Button variant="secondary" className="flex-1" onClick={() => setOpen(false)}>
+        <div className="mb-4 flex gap-2.5">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex-1 rounded-[10px] bg-[#f2f2f2] py-3 text-center text-sm font-semibold text-foreground"
+          >
             Annulla
-          </Button>
-          <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="flex-1 rounded-[10px] bg-[#1a1a1a] py-3 text-center text-sm font-semibold text-white disabled:opacity-50"
+          >
             Salva
-          </Button>
+          </button>
         </div>
 
         {confirmingDelete ? (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
-            <p className="mb-2.5 text-sm font-medium text-destructive">
+          <div className="rounded-xl border border-[#f3d4d4] bg-[#fef2f2] p-3.5">
+            <p className="mb-2.5 text-[13px] font-semibold text-[#991b1b]">
               Eliminare questo progetto? L&apos;azione non è reversibile.
             </p>
             <div className="flex gap-2.5">
-              <Button
-                variant="outline"
-                className="flex-1"
+              <button
+                type="button"
                 onClick={() => setConfirmingDelete(false)}
+                className="flex-1 rounded-[10px] border border-[#f3d4d4] bg-white py-2.5 text-center text-[13px] font-semibold text-foreground"
               >
                 Annulla
-              </Button>
-              <Button
-                variant="destructive"
-                className="flex-1"
+              </button>
+              <button
+                type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
+                className="flex-1 rounded-[10px] bg-destructive py-2.5 text-center text-[13px] font-semibold text-white disabled:opacity-50"
               >
                 Elimina
-              </Button>
+              </button>
             </div>
           </div>
         ) : (
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="w-full rounded-xl border border-destructive/30 py-3 text-sm font-medium text-destructive"
+            className="w-full rounded-[10px] border border-[#f3d4d4] py-3 text-center text-[13.5px] font-semibold text-destructive"
           >
             Elimina progetto
           </button>
@@ -233,9 +246,11 @@ export function EditBoardSheet({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger render={trigger} />
-      <DialogContent className="max-h-[85vh] max-w-md overflow-y-auto">
+      <DialogContent showCloseButton={false} className="max-h-[85vh] w-full max-w-[460px] overflow-y-auto rounded-2xl p-6">
         <DialogHeader>
-          <DialogTitle>Modifica progetto</DialogTitle>
+          <DialogTitle className="mb-1 font-heading text-base font-bold text-foreground">
+            Modifica progetto
+          </DialogTitle>
         </DialogHeader>
         {body}
       </DialogContent>

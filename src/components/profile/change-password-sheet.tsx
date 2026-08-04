@@ -55,10 +55,10 @@ export function ChangePasswordSheet() {
         render={
           <button
             type="button"
-            className="flex w-full items-center justify-between rounded-2xl border p-3.5 text-left text-[13.5px] font-medium"
+            className="flex w-full items-center justify-between rounded-[14px] border border-border p-3.5 text-left text-[13.5px] font-medium text-foreground"
           >
             Cambia password
-            <ChevronRight className="size-3.5 text-muted-foreground" />
+            <ChevronRight className="size-3.5 text-[#c2c2c2]" />
           </button>
         }
       />

@@ -79,16 +79,24 @@ export function CardLabelsPopover({
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {labels.map((l) => (
-        <Badge key={l.id} style={{ backgroundColor: l.color, color: textColorFor(l.color) }}>
+        <Badge
+          key={l.id}
+          className="h-auto rounded-full px-2.5 py-[3px] text-[11px] font-semibold"
+          style={{ backgroundColor: l.color, color: textColorFor(l.color) }}
+        >
           {l.name || " "}
         </Badge>
       ))}
       <Popover>
         <PopoverTrigger
           render={
-            <Button variant="outline" size="icon-sm" className="rounded-full">
+            <button
+              type="button"
+              aria-label="Aggiungi etichetta"
+              className="flex size-7 items-center justify-center rounded-full border-[1.5px] border-dashed border-[#c2c2c2] text-ink-faint"
+            >
               <Plus className="size-3.5" />
-            </Button>
+            </button>
           }
         />
         <PopoverContent align="start">

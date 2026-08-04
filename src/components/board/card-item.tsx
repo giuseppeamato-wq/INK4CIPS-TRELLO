@@ -54,15 +54,15 @@ export function CardItem({
       {...listeners}
       onClick={() => onOpen?.(card.id)}
       className={cn(
-        "flex cursor-grab overflow-hidden rounded-md border bg-card text-sm shadow-sm active:cursor-grabbing",
+        "flex cursor-grab overflow-hidden rounded-[12px] border border-border bg-card text-sm shadow-[0_1px_2px_rgba(0,0,0,0.03)] active:cursor-grabbing",
         isDragging && "opacity-40"
       )}
     >
       {kind && <div className={cn("w-[5px] shrink-0", LIST_KIND_INFO[kind].barClassName)} />}
-      <div className="flex flex-1 flex-col gap-1.5 p-2.5">
-        <span className="font-medium">{card.title}</span>
+      <div className="flex flex-1 flex-col gap-2 px-3.5 py-3">
+        <span className="text-[13.5px] leading-[1.3] font-semibold text-foreground">{card.title}</span>
         {hasLabels && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {card.labels.map((l) => (
               <span
                 key={l.id}
@@ -75,9 +75,9 @@ export function CardItem({
           </div>
         )}
         {(hasChecklist || card.dueDate) && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             {hasChecklist && (
-              <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <span className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
                 <CheckSquare className="size-3" />
                 {card.checklist!.done}/{card.checklist!.total}
               </span>
@@ -85,8 +85,8 @@ export function CardItem({
             {card.dueDate && (
               <span
                 className={cn(
-                  "inline-flex w-fit items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium",
-                  isOverdue ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                  "flex w-fit items-center gap-1 text-[11px] font-medium",
+                  isOverdue ? "text-destructive" : "text-muted-foreground"
                 )}
               >
                 <Clock className="size-3" />
@@ -97,7 +97,7 @@ export function CardItem({
         )}
       </div>
       {hasAssignees && (
-        <div className="flex shrink-0 items-center pr-3">
+        <div className="flex shrink-0 items-center px-3">
           {card.assignees!.slice(0, 3).map((person, i) => (
             <div
               key={person.userId}

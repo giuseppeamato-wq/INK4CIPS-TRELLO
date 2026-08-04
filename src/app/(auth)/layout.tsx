@@ -15,20 +15,20 @@ export default async function AuthLayout({
   if (session) redirect("/")
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-background sm:bg-muted/30 sm:p-4 lg:bg-muted/30 lg:p-6">
-      <div className="flex w-full max-w-sm overflow-hidden lg:max-w-4xl lg:rounded-2xl lg:shadow-2xl lg:shadow-black/10">
-        {/* Desktop: branded panel, mirrors the design system's split-screen login */}
-        <div className="hidden w-[45%] shrink-0 flex-col items-center justify-center gap-4 bg-gradient-to-br from-neutral-900 to-neutral-700 p-10 text-center lg:flex">
-          <img src="/logo.png" alt="INK4CIPS" className="size-20 rounded-2xl" />
-          <span className="font-heading text-3xl font-extrabold tracking-tight text-white">
+    <div className="flex min-h-svh items-center justify-center bg-[#e8e8e8] p-0 py-6 lg:p-6">
+      <div className="flex w-full overflow-hidden bg-white lg:max-w-6xl lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
+        {/* Desktop: branded panel, matches the design system's split-screen login exactly */}
+        <div className="hidden flex-1 flex-col items-center justify-center gap-[18px] bg-[linear-gradient(135deg,#1a1a1a,#333333)] p-10 text-center lg:flex">
+          <img src="/logo.png" alt="INK4CIPS" className="h-[82px] w-[88px] rounded-2xl object-cover" />
+          <span className="font-heading text-[32px] font-extrabold tracking-[-0.02em] text-white">
             INK4CIPS
           </span>
-          <p className="text-sm text-white/70">LA PEPPEFORMA</p>
-          <p className="max-w-xs text-sm text-white/70">
+          <p className="max-w-[320px] text-sm text-white/70">LA PEPPEFORMA</p>
+          <p className="max-w-[320px] text-sm text-white/70">
             Organizza i tuoi progetti in workspace, board e card, tutto in un unico posto.
           </p>
         </div>
-        <div className="flex flex-1 items-center justify-center bg-background p-0 lg:p-10">
+        <div className="flex flex-1 items-center justify-center p-0 lg:w-[460px] lg:flex-none lg:p-[60px]">
           <div className="w-full max-w-sm">{children}</div>
         </div>
       </div>

@@ -2,9 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { createCardAction } from "@/lib/actions/cards"
 import { keyBetween } from "@/lib/ordering/position"
 import type { CardT } from "./card-item"
@@ -45,24 +43,23 @@ export function CreateCardForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground hover:bg-muted"
+        className="rounded-xl border-[1.5px] border-dashed border-[#dcdcdc] p-3 text-center text-[12.5px] font-semibold text-ink-faint"
       >
-        <Plus className="size-3.5" />
-        Aggiungi card
+        + Aggiungi una card
       </button>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <Textarea
+    <div className="rounded-xl border border-border bg-white p-2.5">
+      <Input
         autoFocus
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Titolo card..."
-        className="min-h-16 resize-none text-sm"
+        placeholder="Titolo della card"
+        className="mb-2 h-9 rounded-lg border-[#e5e5e5] bg-[#fafafa] px-2.5 text-[13px]"
         onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+          if (e.key === "Enter") {
             e.preventDefault()
             submit()
           }
@@ -70,19 +67,22 @@ export function CreateCardForm({
         }}
       />
       <div className="flex gap-2">
-        <Button size="sm" onClick={submit} disabled={isSubmitting}>
+        <button
+          onClick={submit}
+          disabled={isSubmitting}
+          className="flex-1 rounded-lg bg-[#1a1a1a] py-1.5 text-center text-xs font-semibold text-white"
+        >
           Aggiungi
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
+        </button>
+        <button
           onClick={() => {
             setOpen(false)
             setTitle("")
           }}
+          className="flex-1 rounded-lg bg-[#f2f2f2] py-1.5 text-center text-xs font-semibold text-foreground"
         >
           Annulla
-        </Button>
+        </button>
       </div>
     </div>
   )

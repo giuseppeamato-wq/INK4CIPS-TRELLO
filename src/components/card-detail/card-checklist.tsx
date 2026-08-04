@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { Plus, X } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
   createChecklistItemAction,
   deleteChecklistItemAction,
@@ -70,34 +70,40 @@ export function CardChecklist({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">{checklist.title}</span>
-        {total > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {done}/{total}
-          </span>
-        )}
+        <span className="text-sm font-semibold text-foreground">{checklist.title}</span>
+        {total > 0 && <span className="text-xs text-ink-faint">{done}/{total}</span>}
       </div>
       {total > 0 && (
-        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+        <div className="h-1.5 overflow-hidden rounded-[4px] bg-[#eeeeee]">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-[width]"
+            className="h-full rounded-[4px] bg-[#22c55e] transition-[width]"
             style={{ width: `${Math.round((done / total) * 100)}%` }}
           />
         </div>
       )}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         {checklist.items.map((item) => (
-          <div key={item.id} className="group flex items-center gap-2 rounded-md px-1 py-1 hover:bg-muted">
-            <Checkbox
-              checked={item.isComplete}
-              onCheckedChange={(checked) => toggle(item.id, checked === true)}
-            />
-            <span className={item.isComplete ? "flex-1 text-sm text-muted-foreground line-through" : "flex-1 text-sm"}>
+          <div key={item.id} className="group flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => toggle(item.id, !item.isComplete)}
+              className={cn(
+                "flex size-[18px] shrink-0 items-center justify-center rounded-[5px] border-[1.6px]",
+                item.isComplete ? "border-[#22c55e] bg-[#22c55e]" : "border-[#d4d4d4] bg-transparent"
+              )}
+            >
+              {item.isComplete && (
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12L10 17L19 7" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
+            <span className={cn("flex-1 text-[13px]", item.isComplete ? "text-ink-faint line-through" : "text-foreground")}>
               {item.text}
             </span>
             <button
               onClick={() => remove(item.id)}
-              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
+              className="text-ink-faint opacity-0 group-hover:opacity-100 hover:text-destructive"
             >
               <X className="size-3.5" />
             </button>
@@ -109,7 +115,7 @@ export function CardChecklist({
           value={newItemText}
           onChange={(e) => setNewItemText(e.target.value)}
           placeholder="Aggiungi elemento..."
-          className="h-8 text-sm"
+          className="h-8 rounded-lg border-[#e5e5e5] bg-[#fafafa] text-sm"
           onKeyDown={(e) => {
             if (e.key === "Enter") addItem()
           }}
