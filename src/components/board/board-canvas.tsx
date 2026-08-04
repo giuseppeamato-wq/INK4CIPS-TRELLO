@@ -235,16 +235,55 @@ export function BoardCanvas({
     })
   }
 
+  // Same idea for reordering a card within its own list — desktop does
+  // this with drag-and-drop, mobile gets an explicit up/down swap instead.
+  function handleCardReorder(cardId: string, direction: "up" | "down") {
+    const current = cards.find((c) => c.id === cardId)
+    if (!current) return
+    const siblings = cards
+      .filter((c) => c.listId === current.listId)
+      .sort((a, b) => (a.sortKey < b.sortKey ? -1 : 1))
+    const idx = siblings.findIndex((c) => c.id === cardId)
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1
+    if (targetIdx < 0 || targetIdx >= siblings.length) return
+
+    const reordered = [...siblings]
+    ;[reordered[idx], reordered[targetIdx]] = [reordered[targetIdx], reordered[idx]]
+    const newIdx = reordered.findIndex((c) => c.id === cardId)
+    const before = reordered[newIdx - 1]?.sortKey ?? null
+    const after = reordered[newIdx + 1]?.sortKey ?? null
+    const newKey = keyBetween(before, after)
+
+    setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, sortKey: newKey } : c)))
+    moveCardAction(cardId, current.listId, newKey).catch((err) => {
+      toast.error(err instanceof Error ? err.message : "Errore nello spostamento della card")
+    })
+  }
+
   if (isMobile) {
     return (
       <>
         <MobileBoardView
+          boardId={boardId}
           lists={sortedLists}
           cards={cards}
           canEdit={canEdit}
           onCardOpen={openCard}
           onCardCreated={(card) =>
             setCards((prev) => (prev.some((c) => c.id === card.id) ? prev : [...prev, card]))
+          }
+          onListCreated={(list) =>
+            setLists((prev) => (prev.some((l) => l.id === list.id) ? prev : [...prev, list]))
+          }
+          onListRenamed={(listId, name) =>
+            setLists((prev) => prev.map((l) => (l.id === listId ? { ...l, name } : l)))
+          }
+          onListDeleted={(listId) => {
+            setLists((prev) => prev.filter((l) => l.id !== listId))
+            setCards((prev) => prev.filter((c) => c.listId !== listId))
+          }}
+          onListMoved={(listId, sortKey) =>
+            setLists((prev) => prev.map((l) => (l.id === listId ? { ...l, sortKey } : l)))
           }
         />
         {openCardId && (
@@ -266,6 +305,7 @@ export function BoardCanvas({
               closeCard()
             }}
             onCardMoved={handleCardMoved}
+            onCardReorder={handleCardReorder}
           />
         )}
       </>

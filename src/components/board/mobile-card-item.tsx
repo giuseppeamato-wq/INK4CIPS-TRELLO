@@ -11,7 +11,7 @@ export function MobileCardItem({
   onOpen,
 }: {
   card: CardT
-  kind: ListKind
+  kind?: ListKind | null
   onOpen: (cardId: string) => void
 }) {
   const hasChecklist = !!card.checklist && card.checklist.total > 0
@@ -22,7 +22,7 @@ export function MobileCardItem({
       onClick={() => onOpen(card.id)}
       className="flex cursor-pointer overflow-hidden rounded-xl border bg-card shadow-sm"
     >
-      <div className={cn("w-[5px] shrink-0", LIST_KIND_INFO[kind].barClassName)} />
+      {kind && <div className={cn("w-[5px] shrink-0", LIST_KIND_INFO[kind].barClassName)} />}
       <div className="flex flex-1 flex-col gap-2 p-3">
         <div className="text-sm font-medium">{card.title}</div>
 

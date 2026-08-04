@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Plus, Trash2 } from "lucide-react"
+import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -48,6 +48,7 @@ export function CardModal({
   onTitleChanged,
   onDeleted,
   onCardMoved,
+  onCardReorder,
 }: {
   cardId: string
   boardId: string
@@ -58,6 +59,7 @@ export function CardModal({
   onTitleChanged: (cardId: string, title: string) => void
   onDeleted: (cardId: string) => void
   onCardMoved?: (cardId: string, targetListId: string) => void
+  onCardReorder?: (cardId: string, direction: "up" | "down") => void
 }) {
   const isMobile = useIsMobile()
   const [detail, setDetail] = useState<CardDetailT | null>(null)
@@ -196,7 +198,35 @@ export function CardModal({
         onClick={(e) => e.stopPropagation()}
         className="w-[260px] rounded-2xl bg-white p-4 shadow-[0_12px_30px_rgba(0,0,0,0.2)]"
       >
-        <div className="mb-2.5 font-heading text-sm font-bold text-foreground">Sposta in</div>
+        {onCardReorder && (
+          <>
+            <div className="mb-1 font-heading text-sm font-bold text-foreground">Riordina</div>
+            <button
+              type="button"
+              onClick={() => {
+                onCardReorder(cardId, "up")
+                setShowMovePicker(false)
+              }}
+              className="flex w-full items-center gap-2 rounded-[9px] px-2 py-2.5 text-left"
+            >
+              <ArrowUp className="size-4 text-muted-foreground" />
+              <span className="text-[13.5px] font-semibold text-foreground">Sposta su</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onCardReorder(cardId, "down")
+                setShowMovePicker(false)
+              }}
+              className="flex w-full items-center gap-2 rounded-[9px] px-2 py-2.5 text-left"
+            >
+              <ArrowDown className="size-4 text-muted-foreground" />
+              <span className="text-[13.5px] font-semibold text-foreground">Sposta giù</span>
+            </button>
+            <div className="my-2 border-t border-[#f0f0f0]" />
+          </>
+        )}
+        <div className="mb-2.5 font-heading text-sm font-bold text-foreground">Sposta in un&apos;altra lista</div>
         {moveOptions.length === 0 ? (
           <p className="px-2 py-1.5 text-[13px] text-muted-foreground">Nessun&apos;altra lista disponibile.</p>
         ) : (
@@ -222,7 +252,7 @@ export function CardModal({
     </div>
   )
 
-  const moveButton = onCardMoved && (
+  const moveButton = (onCardMoved || onCardReorder) && (
     <button
       type="button"
       onClick={() => setShowMovePicker(true)}
