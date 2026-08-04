@@ -1,10 +1,11 @@
 "use server"
 
-import { and, eq } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 import { getDb } from "@/db"
-import { workspaceInvites, workspaceMembers, workspaces } from "@/db/schema"
+import { user as userTable, workspaceInvites, workspaceMembers, workspaces } from "@/db/schema"
 import { requireSession } from "@/lib/auth/session"
 import { ForbiddenError, requireWorkspaceAdmin, requireWorkspaceOwner } from "@/lib/authz/guards"
+import { reconcilePendingInvites } from "@/lib/invites"
 import { slugify } from "@/lib/slug"
 
 export async function createWorkspaceAction(name: string) {
@@ -35,6 +36,19 @@ export async function createInviteAction(
     .insert(workspaceInvites)
     .values({ workspaceId, email, role, invitedBy: session.user.id })
     .returning({ id: workspaceInvites.id, email: workspaceInvites.email, role: workspaceInvites.role })
+
+  // If the invited email already belongs to an account, don't make them
+  // wait for their next login to see the workspace — an already-signed-in
+  // colleague otherwise never gets a fresh session, so the invite would sit
+  // as "pending" indefinitely (see reconcilePendingInvites' other call sites
+  // in src/lib/auth/index.ts, which only fire on signup/login).
+  const [existingUser] = await db
+    .select({ id: userTable.id })
+    .from(userTable)
+    .where(eq(sql`lower(${userTable.email})`, email.toLowerCase()))
+  if (existingUser) {
+    await reconcilePendingInvites(db, email, existingUser.id)
+  }
 
   return invite
 }
