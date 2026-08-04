@@ -2,16 +2,16 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { NotificationBell, type NotificationT } from "@/components/notifications/notification-bell"
 
-// Workspace/board/profile pages already render their own branded sidebar
-// (logo, nav, profile row), so this bar would just duplicate it on desktop —
-// it only needs to show there on mobile, which has no sidebar. Pages with no
-// sidebar of their own (e.g. the "/" workspace picker) still get the full
-// desktop bar since they have no other way back to a workspace or to log out.
+// Workspace/board/profile pages render their own header at every breakpoint
+// now (the desktop sidebar's profile row, or the mobile workspace bar's own
+// avatar button / a page's own back-chevron title), so this bar would just
+// duplicate them and is hidden there entirely. Pages with no header of their
+// own (e.g. the "/" workspace picker) still get the full bar since they have
+// no other way back to a workspace or to log out.
 export function AppHeader({
   userEmail,
   userLabel,
@@ -24,15 +24,13 @@ export function AppHeader({
   unreadCount: number
 }) {
   const pathname = usePathname()
-  const isWorkspaceShell = pathname.startsWith("/w/") || pathname.startsWith("/profile")
+  const isWorkspaceShell =
+    pathname === "/w" || pathname.startsWith("/w/") || pathname.startsWith("/profile")
+
+  if (isWorkspaceShell) return null
 
   return (
-    <header
-      className={cn(
-        "flex h-14 shrink-0 items-center justify-between border-b px-4",
-        isWorkspaceShell && "md:hidden"
-      )}
-    >
+    <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
       <Link href="/" className="truncate font-heading text-sm font-semibold">
         INK4CIPS
       </Link>

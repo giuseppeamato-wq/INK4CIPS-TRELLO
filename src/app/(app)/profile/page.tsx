@@ -20,23 +20,23 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="hidden items-center gap-3.5 px-9 pt-6 pb-2 md:flex">
+      <div className="flex items-center gap-3.5 px-[18px] pt-[18px] pb-2 md:px-9 md:pt-6">
         <Link
           href="/"
           aria-label="Torna al workspace"
-          className="flex size-9 items-center justify-center rounded-[9px] bg-ink-soft"
+          className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-ink-soft md:size-9"
         >
           <ChevronLeft className="size-4 text-foreground" />
         </Link>
-        <span className="font-heading text-[19px] font-bold text-foreground">Profilo</span>
+        <span className="font-heading text-[17px] font-bold text-foreground md:text-[19px]">Profilo</span>
       </div>
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col p-5">
       <div className="mb-6 flex flex-col items-center gap-2.5 py-4">
-        <Avatar size="lg" className="size-[88px]">
+        <Avatar size="lg" className="size-[76px] md:size-[88px]">
           {session.user.image && <AvatarImage src={session.user.image} alt={session.user.name} />}
           <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
         </Avatar>
-        <div className="font-heading text-xl font-bold text-foreground">{session.user.name}</div>
+        <div className="font-heading text-[18px] font-bold text-foreground md:text-xl">{session.user.name}</div>
         <div className="text-[13.5px] text-muted-foreground">{session.user.email}</div>
         <Link
           href="/profile/edit"

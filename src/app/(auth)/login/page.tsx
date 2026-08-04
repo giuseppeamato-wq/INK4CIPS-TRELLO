@@ -50,7 +50,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full px-5 py-8 lg:p-0">
+    <div className="w-full px-7 pb-10 lg:p-0">
       <div className="mb-1.5 font-heading text-2xl font-bold text-foreground">Bentornato</div>
       <p className="mb-8 text-sm text-muted-foreground">
         Accedi al tuo spazio di lavoro per continuare.

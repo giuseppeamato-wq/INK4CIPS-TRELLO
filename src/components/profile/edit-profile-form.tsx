@@ -8,6 +8,12 @@ import { authClient } from "@/lib/auth/client"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useIsMobile } from "@/hooks/use-mobile"
+import {
+  BottomSheet,
+  BottomSheetContent,
+} from "@/components/ui/bottom-sheet"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { ChangePasswordSheet } from "./change-password-sheet"
 
 export function EditProfileForm({
@@ -24,13 +30,16 @@ export function EditProfileForm({
   initialBio: string
 }) {
   const router = useRouter()
+  const isMobile = useIsMobile()
   const [name, setName] = useState(initialName)
   const [jobTitle, setJobTitle] = useState(initialJobTitle)
   const [bio, setBio] = useState(initialBio)
   const [avatarUrl, setAvatarUrl] = useState(image)
   const [isSaving, setIsSaving] = useState(false)
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const [showPhotoSheet, setShowPhotoSheet] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
 
   async function handleAvatarSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -54,6 +63,7 @@ export function EditProfileForm({
   }
 
   async function handleRemoveAvatar() {
+    setShowPhotoSheet(false)
     setIsUploadingAvatar(true)
     try {
       await fetch("/api/users/avatar", { method: "DELETE" })
@@ -116,7 +126,7 @@ export function EditProfileForm({
           </Avatar>
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setShowPhotoSheet(true)}
             disabled={isUploadingAvatar}
             aria-label="Cambia foto"
             className="absolute -right-0.5 -bottom-0.5 flex size-[30px] items-center justify-center rounded-full border-2 border-white bg-white shadow-[0_2px_6px_rgba(0,0,0,0.18)]"
@@ -130,26 +140,99 @@ export function EditProfileForm({
             onChange={handleAvatarSelected}
             className="hidden"
           />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="user"
+            onChange={handleAvatarSelected}
+            className="hidden"
+          />
         </div>
         <button
           type="button"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => setShowPhotoSheet(true)}
           disabled={isUploadingAvatar}
           className="text-[12.5px] font-semibold text-muted-foreground"
         >
           Cambia foto
         </button>
-        {avatarUrl && (
-          <button
-            type="button"
-            onClick={handleRemoveAvatar}
-            disabled={isUploadingAvatar}
-            className="text-xs font-semibold text-destructive"
-          >
-            Rimuovi foto
-          </button>
-        )}
       </div>
+
+      {isMobile ? (
+        <BottomSheet open={showPhotoSheet} onOpenChange={setShowPhotoSheet}>
+          <BottomSheetContent>
+            <button
+              type="button"
+              onClick={() => {
+                setShowPhotoSheet(false)
+                fileInputRef.current?.click()
+              }}
+              className="w-full border-b border-[#f2f2f2] py-3.5 text-left text-[14.5px] font-semibold text-foreground"
+            >
+              Scegli dalla galleria
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowPhotoSheet(false)
+                cameraInputRef.current?.click()
+              }}
+              className="w-full border-b border-[#f2f2f2] py-3.5 text-left text-[14.5px] font-semibold text-foreground"
+            >
+              Scatta una foto
+            </button>
+            {avatarUrl && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                className="w-full py-3.5 text-left text-[14.5px] font-semibold text-destructive"
+              >
+                Rimuovi foto
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowPhotoSheet(false)}
+              className="mt-2 w-full rounded-[10px] bg-[#f2f2f2] py-3 text-center text-sm font-semibold text-foreground"
+            >
+              Annulla
+            </button>
+          </BottomSheetContent>
+        </BottomSheet>
+      ) : (
+        <Dialog open={showPhotoSheet} onOpenChange={setShowPhotoSheet}>
+          <DialogContent showCloseButton={false} className="w-full max-w-[340px] rounded-2xl p-[18px]">
+            <DialogTitle className="sr-only">Cambia foto profilo</DialogTitle>
+            <button
+              type="button"
+              onClick={() => {
+                setShowPhotoSheet(false)
+                fileInputRef.current?.click()
+              }}
+              className="w-full border-b border-[#f2f2f2] py-3.5 text-left text-[14.5px] font-semibold text-foreground"
+            >
+              Carica una foto
+            </button>
+            {avatarUrl && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                className="w-full py-3.5 text-left text-[14.5px] font-semibold text-destructive"
+              >
+                Rimuovi foto
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowPhotoSheet(false)}
+              className="mt-2 w-full rounded-[10px] bg-[#f2f2f2] py-3 text-center text-sm font-semibold text-foreground"
+            >
+              Annulla
+            </button>
+          </DialogContent>
+        </Dialog>
+      )}
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">

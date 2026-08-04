@@ -29,7 +29,20 @@ export default async function AuthLayout({
           </p>
         </div>
         <div className="flex flex-1 items-center justify-center p-0 lg:w-[460px] lg:flex-none lg:p-[60px]">
-          <div className="w-full max-w-sm">{children}</div>
+          <div className="w-full max-w-sm">
+            {/* Mobile: no split dark panel, so the logo block moves inline
+                above the form, matching Trello Mobile.dc.html's LOGIN SCREEN. */}
+            <div className="mb-12 flex flex-col items-center gap-3.5 pt-10 lg:hidden">
+              <img src="/logo.png" alt="INK4CIPS" className="h-[102px] w-[108px] rounded-[14px] object-cover" />
+              <span className="font-heading text-2xl font-extrabold tracking-[-0.02em] text-foreground">
+                INK4CIPS
+              </span>
+              <span className="font-heading text-[15px] font-extrabold tracking-[-0.02em] text-foreground">
+                LA PEPPEFORMA
+              </span>
+            </div>
+            {children}
+          </div>
         </div>
       </div>
     </div>

@@ -48,15 +48,15 @@ export function MobileBoardView({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="p-4 pb-2">
-        <div className="flex gap-1 rounded-xl bg-muted p-1">
+      <div className="px-[18px] pt-4 pb-2">
+        <div className="flex gap-1 rounded-xl bg-[#f2f2f2] p-1">
           {LIST_KIND_ORDER.map((kind) => (
             <button
               key={kind}
               onClick={() => setActiveTab(kind)}
               className={cn(
-                "flex-1 rounded-lg py-2 text-center text-[12.5px] font-bold",
-                activeTab === kind ? "bg-background shadow-sm" : "text-muted-foreground"
+                "flex-1 rounded-[9px] py-2 text-center text-[12.5px] font-bold",
+                activeTab === kind ? "bg-white text-foreground shadow-sm" : "text-muted-foreground"
               )}
             >
               {LIST_KIND_INFO[kind].name} · {cardsByKind.get(kind)?.length ?? 0}
@@ -65,7 +65,7 @@ export function MobileBoardView({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-4 pt-2">
+      <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto px-[18px] pt-2.5 pb-[100px]">
         {activeCards.map((card) => (
           <MobileCardItem key={card.id} card={card} kind={activeTab} onOpen={onCardOpen} />
         ))}

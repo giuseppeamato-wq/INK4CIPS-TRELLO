@@ -219,6 +219,22 @@ export function BoardCanvas({
     ? sortedLists.find((l) => l.id === openCard_.listId)?.kind
     : null
 
+  // Mobile has no drag-and-drop, so the card modal offers an explicit
+  // "Sposta in" list picker instead — appends the card at the end of the
+  // target list, mirroring handleDragEnd's card-move branch above.
+  function handleCardMoved(cardId: string, targetListId: string) {
+    const current = cards.find((c) => c.id === cardId)
+    if (!current || current.listId === targetListId) return
+    const siblings = cards
+      .filter((c) => c.listId === targetListId)
+      .sort((a, b) => (a.sortKey < b.sortKey ? -1 : 1))
+    const newKey = keyBetween(siblings.length ? siblings[siblings.length - 1].sortKey : null, null)
+    setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, listId: targetListId, sortKey: newKey } : c)))
+    moveCardAction(cardId, targetListId, newKey).catch((err) => {
+      toast.error(err instanceof Error ? err.message : "Errore nello spostamento della card")
+    })
+  }
+
   if (isMobile) {
     return (
       <>
@@ -238,6 +254,7 @@ export function BoardCanvas({
             boardId={boardId}
             canEdit={canEdit}
             cardKind={openCardKind}
+            lists={sortedLists}
             onOpenChange={(open) => {
               if (!open) closeCard()
             }}
@@ -248,6 +265,7 @@ export function BoardCanvas({
               setCards((prev) => prev.filter((c) => c.id !== cardId))
               closeCard()
             }}
+            onCardMoved={handleCardMoved}
           />
         )}
       </>
@@ -313,6 +331,7 @@ export function BoardCanvas({
           boardId={boardId}
           canEdit={canEdit}
           cardKind={openCardKind}
+          lists={sortedLists}
           onOpenChange={(open) => {
             if (!open) closeCard()
           }}
@@ -323,6 +342,7 @@ export function BoardCanvas({
             setCards((prev) => prev.filter((c) => c.id !== cardId))
             closeCard()
           }}
+          onCardMoved={handleCardMoved}
         />
       )}
     </DndContext>

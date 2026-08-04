@@ -36,22 +36,28 @@ import { CardLabelsPopover } from "./card-labels-popover"
 import { CardAttachments } from "./card-attachments"
 import type { BoardMemberT, CardDetailT } from "./types"
 
+type MoveListOption = { id: string; name: string; kind: ListKind | null }
+
 export function CardModal({
   cardId,
   boardId,
   canEdit,
   cardKind,
+  lists,
   onOpenChange,
   onTitleChanged,
   onDeleted,
+  onCardMoved,
 }: {
   cardId: string
   boardId: string
   canEdit: boolean
   cardKind?: ListKind | null
+  lists?: MoveListOption[]
   onOpenChange: (open: boolean) => void
   onTitleChanged: (cardId: string, title: string) => void
   onDeleted: (cardId: string) => void
+  onCardMoved?: (cardId: string, targetListId: string) => void
 }) {
   const isMobile = useIsMobile()
   const [detail, setDetail] = useState<CardDetailT | null>(null)
@@ -64,6 +70,7 @@ export function CardModal({
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
   const [deletePassword, setDeletePassword] = useState("")
   const [deleteError, setDeleteError] = useState(false)
+  const [showMovePicker, setShowMovePicker] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -175,6 +182,63 @@ export function CardModal({
     <span className={cn("text-[11px] font-bold tracking-[0.04em] uppercase", LIST_KIND_INFO[cardKind].textClassName)}>
       {LIST_KIND_INFO[cardKind].name}
     </span>
+  )
+
+  const KIND_DOT_COLOR: Record<ListKind, string> = { todo: "#ef4444", in_progress: "#eab308", done: "#22c55e" }
+  const moveOptions = (lists ?? []).filter((l) => l.id !== detail.card.listId)
+
+  const movePicker = showMovePicker && (
+    <div
+      onClick={() => setShowMovePicker(false)}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/35"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-[260px] rounded-2xl bg-white p-4 shadow-[0_12px_30px_rgba(0,0,0,0.2)]"
+      >
+        <div className="mb-2.5 font-heading text-sm font-bold text-foreground">Sposta in</div>
+        {moveOptions.length === 0 ? (
+          <p className="px-2 py-1.5 text-[13px] text-muted-foreground">Nessun&apos;altra lista disponibile.</p>
+        ) : (
+          moveOptions.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => {
+                onCardMoved?.(cardId, opt.id)
+                setShowMovePicker(false)
+              }}
+              className="flex w-full items-center gap-2 rounded-[9px] px-2 py-2.5 text-left"
+            >
+              <span
+                className="size-2 shrink-0 rounded-full"
+                style={{ background: opt.kind ? KIND_DOT_COLOR[opt.kind] : "#a3a3a3" }}
+              />
+              <span className="text-[13.5px] font-semibold text-foreground">{opt.name}</span>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
+  const moveButton = onCardMoved && (
+    <button
+      type="button"
+      onClick={() => setShowMovePicker(true)}
+      aria-label="Sposta card"
+      className="flex size-7 items-center justify-center rounded-full bg-[#f2f2f2]"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 7H20M8 3L4 7L8 11M20 17H4M16 13L20 17L16 21"
+          stroke="#5a5a5a"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
   )
 
   const titleRow = (
@@ -336,15 +400,18 @@ export function CardModal({
         <BottomSheetContent>
           <div className="mb-1 flex items-center justify-between">
             {kindLabel ?? <span />}
-            <button
-              onClick={() => onOpenChange(false)}
-              aria-label="Chiudi"
-              className="flex size-7 items-center justify-center rounded-full bg-[#f2f2f2]"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                <path d="M5 5L19 19M19 5L5 19" stroke="#5a5a5a" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </button>
+            <div className="flex gap-2">
+              {moveButton}
+              <button
+                onClick={() => onOpenChange(false)}
+                aria-label="Chiudi"
+                className="flex size-7 items-center justify-center rounded-full bg-[#f2f2f2]"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 5L19 19M19 5L5 19" stroke="#5a5a5a" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
           </div>
           {body}
         </BottomSheetContent>
@@ -352,6 +419,7 @@ export function CardModal({
           cardId={cardId}
           onChange={(comment) => setDetail({ ...detail, comments: [...detail.comments, comment] })}
         />
+        {movePicker}
       </BottomSheet>
     )
   }

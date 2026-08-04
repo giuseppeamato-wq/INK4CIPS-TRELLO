@@ -29,10 +29,9 @@ export function WorkspaceBoardsGrid({
   }, [boards, query])
 
   return (
-    <div className="flex flex-1 flex-col gap-4 md:gap-0 md:overflow-y-auto">
+    <div className="flex flex-1 flex-col md:overflow-y-auto">
       {/* Desktop header: title + search + "Nuovo board" share one row,
-          matching the design exactly (mobile keeps its own stacked title
-          and floating action buttons, rendered by the page). */}
+          matching the design exactly. */}
       <div className="hidden items-center justify-between md:flex md:px-9 md:pt-7 md:pb-4">
         <div>
           <div className="text-xs font-medium text-ink-faint">Workspace</div>
@@ -63,14 +62,32 @@ export function WorkspaceBoardsGrid({
         </div>
       </div>
 
+      {/* Mobile: search box + "I tuoi board" section label, matching the
+          design's WORKSPACE SCREEN (the title itself lives in the sidebar's
+          mobile bar above). */}
+      <div className="px-5 pt-1.5 md:hidden">
+        <div className="flex h-10 items-center gap-2 rounded-[10px] bg-ink-soft px-3">
+          <Search className="size-[15px] shrink-0 text-ink-faint" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Cerca board"
+            className="w-full bg-transparent text-[13px] text-foreground outline-none placeholder:text-ink-faint"
+          />
+        </div>
+      </div>
+      <div className="px-5 pt-[22px] pb-2.5 font-heading text-[15px] font-bold text-foreground md:hidden">
+        I tuoi board
+      </div>
+
       {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground md:px-9">
+        <p className="px-5 text-sm text-muted-foreground md:px-9">
           {boards.length === 0
             ? "Nessuna board ancora. Creane una per iniziare a organizzare il lavoro."
             : "Nessuna board corrisponde alla ricerca."}
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 pb-20 sm:grid-cols-3 md:gap-[18px] md:px-9 md:pb-10 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 px-5 pb-24 sm:grid-cols-3 md:gap-[18px] md:px-9 md:pb-10 lg:grid-cols-4">
           {filtered.map((board) => (
             <BoardCard
               key={board.id}

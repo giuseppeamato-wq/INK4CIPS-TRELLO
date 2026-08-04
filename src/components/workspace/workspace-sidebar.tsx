@@ -139,20 +139,35 @@ export function WorkspaceSidebar({
 
   return (
     <>
-      {/* Mobile: static bar linking to the full-screen workspace switcher */}
+      {/* Mobile: static bar linking to the full-screen workspace switcher,
+          plus a direct avatar shortcut to the profile screen — matches the
+          design's WORKSPACE SCREEN header exactly. */}
       {!isBoardDetail && !hideMobileBar && (
-        <Link
-          href="/w"
-          className="flex items-center justify-between border-b px-4 py-2.5 md:hidden"
-        >
-          <div>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3.5 md:hidden">
+          <Link href="/w" className="min-w-0">
             <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
               Workspace
               <ChevronDown className="size-3" />
             </span>
-            <span className="font-heading text-base font-bold">{current?.name}</span>
-          </div>
-        </Link>
+            <span className="truncate font-heading text-[19px] font-bold text-foreground">
+              {current?.name}
+            </span>
+          </Link>
+          {currentUser && (
+            <Link
+              href="/profile"
+              aria-label="Profilo"
+              className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-cover bg-center font-heading text-[13px] font-semibold text-white"
+              style={
+                currentUser.image
+                  ? { backgroundImage: `url('${currentUser.image}')` }
+                  : { backgroundColor: "#1a1a1a" }
+              }
+            >
+              {!currentUser.image && currentUser.name.slice(0, 1).toUpperCase()}
+            </Link>
+          )}
+        </div>
       )}
 
       {/* Desktop: static sidebar, matching the design system exactly */}

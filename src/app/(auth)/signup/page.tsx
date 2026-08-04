@@ -55,7 +55,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="w-full px-5 py-8 lg:p-0">
+    <div className="w-full px-7 pb-10 lg:p-0">
       <div className="mb-1.5 font-heading text-2xl font-bold text-foreground">Crea il tuo account</div>
       <p className="mb-8 text-sm text-muted-foreground">
         Inizia a gestire i tuoi progetti con INK4CIPS.
