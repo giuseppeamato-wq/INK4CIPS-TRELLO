@@ -16,6 +16,8 @@ import {
 import { requireSession } from "@/lib/auth/session"
 import {
   getCardBoardId,
+  getChecklistCardId,
+  getChecklistItemChecklistId,
   requireBoardMember,
   requireCardEditor,
   requireCardMember,
@@ -23,6 +25,7 @@ import {
   requireChecklistMember,
 } from "@/lib/authz/guards"
 import { getBoardLabels, getBoardMembers, getCardDetail } from "@/lib/queries/card-detail"
+import { syncCardStatusFromChecklist } from "@/lib/checklist-status"
 import { broadcastToBoard } from "@/lib/realtime/broadcast"
 import { createNotification } from "@/lib/notifications/create"
 
@@ -163,7 +166,11 @@ export async function createChecklistItemAction(checklistId: string, text: strin
       isComplete: checklistItems.isComplete,
       sortKey: checklistItems.sortKey,
     })
-  return item
+
+  const cardId = await getChecklistCardId(checklistId)
+  const cardStatus = cardId ? await syncCardStatusFromChecklist(db, cardId) : null
+
+  return { ...item, cardStatus }
 }
 
 export async function toggleChecklistItemAction(itemId: string, isComplete: boolean) {
@@ -171,13 +178,28 @@ export async function toggleChecklistItemAction(itemId: string, isComplete: bool
   await requireChecklistItemMember(itemId, session.user.id)
   const db = getDb()
   await db.update(checklistItems).set({ isComplete }).where(eq(checklistItems.id, itemId))
+
+  const checklistId = await getChecklistItemChecklistId(itemId)
+  const cardId = checklistId ? await getChecklistCardId(checklistId) : null
+  const cardStatus = cardId ? await syncCardStatusFromChecklist(db, cardId) : null
+
+  return { cardStatus }
 }
 
 export async function deleteChecklistItemAction(itemId: string) {
   const session = await requireSession()
   await requireChecklistItemMember(itemId, session.user.id)
   const db = getDb()
+
+  // Resolved before the delete — once the item row is gone there's no way
+  // back to its checklist/card via a join.
+  const checklistId = await getChecklistItemChecklistId(itemId)
+  const cardId = checklistId ? await getChecklistCardId(checklistId) : null
+
   await db.delete(checklistItems).where(eq(checklistItems.id, itemId))
+
+  const cardStatus = cardId ? await syncCardStatusFromChecklist(db, cardId) : null
+  return { cardStatus }
 }
 
 export async function createCommentAction(cardId: string, body: string) {

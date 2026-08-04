@@ -29,6 +29,7 @@ import {
 import { deleteCardAction } from "@/lib/actions/cards"
 import { verifyCurrentPasswordAction } from "@/lib/actions/security"
 import { keyBetween } from "@/lib/ordering/position"
+import type { CardStatusSync } from "@/lib/checklist-status"
 import { CardChecklist } from "./card-checklist"
 import { CardCommentComposer, CardCommentsList } from "./card-comments"
 import { CardMembersPopover } from "./card-members-popover"
@@ -49,6 +50,7 @@ export function CardModal({
   onDeleted,
   onCardMoved,
   onCardReorder,
+  onCardStatusSynced,
 }: {
   cardId: string
   boardId: string
@@ -60,6 +62,11 @@ export function CardModal({
   onDeleted: (cardId: string) => void
   onCardMoved?: (cardId: string, targetListId: string) => void
   onCardReorder?: (cardId: string, direction: "up" | "down") => void
+  // Called after every checklist edit (see syncCardStatusFromChecklist) —
+  // lets the board update the card's checklist badge and, when it moved,
+  // its column immediately instead of waiting on the realtime broadcast,
+  // which only reaches *other* open views.
+  onCardStatusSynced?: (cardId: string, status: NonNullable<CardStatusSync>) => void
 }) {
   const isMobile = useIsMobile()
   const [detail, setDetail] = useState<CardDetailT | null>(null)
@@ -404,6 +411,9 @@ export function CardModal({
                 checklists: detail.checklists.map((c) => (c.id === updated.id ? updated : c)),
               })
             }
+            onCardStatusSynced={(cardStatus) => {
+              if (cardStatus) onCardStatusSynced?.(cardId, cardStatus)
+            }}
           />
         ))}
       </div>

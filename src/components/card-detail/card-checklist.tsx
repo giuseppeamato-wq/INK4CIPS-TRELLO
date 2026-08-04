@@ -12,14 +12,22 @@ import {
   toggleChecklistItemAction,
 } from "@/lib/actions/card-detail"
 import { keyBetween } from "@/lib/ordering/position"
+import type { CardStatusSync } from "@/lib/checklist-status"
 import type { ChecklistT } from "./types"
 
 export function CardChecklist({
   checklist,
   onChange,
+  onCardStatusSynced,
 }: {
   checklist: ChecklistT
   onChange: (checklist: ChecklistT) => void
+  // The checklist is the source of truth for the card's column once it has
+  // items (see syncCardStatusFromChecklist) — every mutation below can move
+  // the card, so each one reports the outcome up to the board so it can
+  // update the card's position immediately, without waiting on the
+  // board-level realtime broadcast (which only reaches *other* open views).
+  onCardStatusSynced?: (cardStatus: CardStatusSync) => void
 }) {
   const [newItemText, setNewItemText] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -33,7 +41,8 @@ export function CardChecklist({
       items: checklist.items.map((i) => (i.id === itemId ? { ...i, isComplete } : i)),
     })
     try {
-      await toggleChecklistItemAction(itemId, isComplete)
+      const { cardStatus } = await toggleChecklistItemAction(itemId, isComplete)
+      onCardStatusSynced?.(cardStatus)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore imprevisto")
     }
@@ -43,7 +52,8 @@ export function CardChecklist({
     const prev = checklist.items
     onChange({ ...checklist, items: checklist.items.filter((i) => i.id !== itemId) })
     try {
-      await deleteChecklistItemAction(itemId)
+      const { cardStatus } = await deleteChecklistItemAction(itemId)
+      onCardStatusSynced?.(cardStatus)
     } catch (err) {
       onChange({ ...checklist, items: prev })
       toast.error(err instanceof Error ? err.message : "Errore imprevisto")
@@ -57,8 +67,9 @@ export function CardChecklist({
     try {
       const lastKey = checklist.items.length ? checklist.items[checklist.items.length - 1].sortKey : null
       const sortKey = keyBetween(lastKey, null)
-      const item = await createChecklistItemAction(checklist.id, trimmed, sortKey)
+      const { cardStatus, ...item } = await createChecklistItemAction(checklist.id, trimmed, sortKey)
       onChange({ ...checklist, items: [...checklist.items, item] })
+      onCardStatusSynced?.(cardStatus)
       setNewItemText("")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore imprevisto")

@@ -18,6 +18,7 @@ import { SortableContext, arrayMove, horizontalListSortingStrategy } from "@dnd-
 import { moveListAction } from "@/lib/actions/lists"
 import { moveCardAction } from "@/lib/actions/cards"
 import { keyBetween } from "@/lib/ordering/position"
+import type { CardStatusSync } from "@/lib/checklist-status"
 import { useBoardRealtime } from "@/lib/realtime/use-board-realtime"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ListColumn, type ListT } from "./list-column"
@@ -260,6 +261,25 @@ export function BoardCanvas({
     })
   }
 
+  // The checklist-driven auto column (Da Fare/In Corso/Fatto) and the
+  // done/total badge already happened server-side by the time this fires —
+  // this just reflects that outcome in this tab's own state immediately,
+  // rather than waiting on the board-level realtime broadcast that updates
+  // every *other* open view (and doesn't carry checklist counts at all).
+  function handleCardStatusSynced(cardId: string, status: NonNullable<CardStatusSync>) {
+    setCards((prev) =>
+      prev.map((c) =>
+        c.id === cardId
+          ? {
+              ...c,
+              checklist: { done: status.done, total: status.total },
+              ...(status.moved ? { listId: status.moved.listId, sortKey: status.moved.sortKey } : {}),
+            }
+          : c
+      )
+    )
+  }
+
   if (isMobile) {
     return (
       <>
@@ -306,6 +326,7 @@ export function BoardCanvas({
             }}
             onCardMoved={handleCardMoved}
             onCardReorder={handleCardReorder}
+            onCardStatusSynced={handleCardStatusSynced}
           />
         )}
       </>
@@ -383,6 +404,7 @@ export function BoardCanvas({
             closeCard()
           }}
           onCardMoved={handleCardMoved}
+          onCardStatusSynced={handleCardStatusSynced}
         />
       )}
     </DndContext>
