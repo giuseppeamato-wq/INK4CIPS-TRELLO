@@ -50,6 +50,13 @@
       "when": 1785600392301,
       "tag": "0006_sour_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1785926686746,
+      "tag": "0007_abandoned_jazinda",
+      "breakpoints": true
     }
   ]
 }
