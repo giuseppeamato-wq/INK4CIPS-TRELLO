@@ -12,13 +12,11 @@ export function WorkspaceBoardsGrid({
   workspaceId,
   workspaceSlug,
   workspaceName,
-  canEdit,
 }: {
   boards: BoardT[]
   workspaceId: string
   workspaceSlug: string
   workspaceName: string
-  canEdit: boolean
 }) {
   const [query, setQuery] = useState("")
 
@@ -94,7 +92,6 @@ export function WorkspaceBoardsGrid({
               board={board}
               workspaceSlug={workspaceSlug}
               workspaceName={workspaceName}
-              canEdit={canEdit}
             />
           ))}
         </div>

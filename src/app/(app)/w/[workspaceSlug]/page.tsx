@@ -2,7 +2,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { Plus, Settings } from "lucide-react"
 import { getSession } from "@/lib/auth/session"
-import { getMyRoleInWorkspace, getWorkspaceBySlug } from "@/lib/queries/workspaces"
+import { getWorkspaceBySlug } from "@/lib/queries/workspaces"
 import { getBoardsForWorkspace } from "@/lib/queries/boards"
 import { CreateBoardDialog } from "@/components/workspace/create-board-dialog"
 import { WorkspaceBoardsGrid } from "@/components/workspace/workspace-boards-grid"
@@ -19,11 +19,7 @@ export default async function WorkspaceBoardsPage({
   const workspace = await getWorkspaceBySlug(workspaceSlug, session.user.id)
   if (!workspace) notFound()
 
-  const [boards, myRole] = await Promise.all([
-    getBoardsForWorkspace(workspace.id, session.user.id),
-    getMyRoleInWorkspace(workspace.id, session.user.id),
-  ])
-  const canEdit = myRole === "owner" || myRole === "admin" || myRole === "editor"
+  const boards = await getBoardsForWorkspace(workspace.id, session.user.id)
 
   return (
     <div className="relative flex flex-1 flex-col md:p-0">
@@ -35,7 +31,6 @@ export default async function WorkspaceBoardsPage({
         workspaceId={workspace.id}
         workspaceSlug={workspaceSlug}
         workspaceName={workspace.name}
-        canEdit={canEdit}
       />
 
       {/* Mobile: floating actions, matching the mockup's gear + plus FABs */}
