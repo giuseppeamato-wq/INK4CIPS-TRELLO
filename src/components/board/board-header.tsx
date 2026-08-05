@@ -44,7 +44,7 @@ export function BoardHeader({
       href={`/w/${workspaceSlug}/b/${board.id}/whiteboard`}
       aria-label="Lavagna progetto"
       title="Lavagna progetto"
-      className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-white/[0.22] md:size-9"
+      className="hidden size-9 shrink-0 items-center justify-center rounded-[9px] bg-white/[0.22] md:flex"
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <circle cx="8.5" cy="8.5" r="6" fill="#7d5cf0" />
@@ -84,10 +84,7 @@ export function BoardHeader({
       <div className="md:hidden">
         <div className="flex items-center justify-between">
           {backButton}
-          <div className="flex gap-2">
-            {whiteboardButton}
-            {editButton}
-          </div>
+          <div className="flex gap-2">{editButton}</div>
         </div>
         <div className="mt-3.5 min-w-0">
           <div className="truncate font-heading text-xl font-extrabold text-white [text-shadow:0_1px_6px_rgb(0_0_0_/_0.2)]">
