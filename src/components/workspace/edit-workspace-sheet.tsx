@@ -256,7 +256,7 @@ export function EditWorkspaceSheet({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger render={trigger} />
-      <DialogContent showCloseButton={false} className="w-full max-w-[420px] rounded-2xl p-6">
+      <DialogContent showCloseButton={false} className="w-full max-w-[420px] rounded-2xl p-6 sm:max-w-[420px]">
         <DialogHeader>
           <DialogTitle className="mb-1 font-heading text-base font-bold text-foreground">
             Modifica workspace
