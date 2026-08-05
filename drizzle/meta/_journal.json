@@ -57,6 +57,20 @@
       "when": 1785926686746,
       "tag": "0007_abandoned_jazinda",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1785928585676,
+      "tag": "0008_rainy_captain_midlands",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1785928602113,
+      "tag": "0009_slippery_the_hood",
+      "breakpoints": true
     }
   ]
 }

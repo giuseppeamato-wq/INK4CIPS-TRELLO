@@ -22,7 +22,7 @@ export function WorkspaceDriveFab({ driveUrl }: { driveUrl: string | null }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Apri Google Drive del workspace"
-      className="flex size-12 items-center justify-center rounded-full bg-white shadow-lg shadow-black/20"
+      className="fixed right-5 bottom-5 z-20 hidden size-12 items-center justify-center rounded-full bg-white shadow-lg shadow-black/20 md:flex"
     >
       <GoogleDriveIcon className="size-6" />
     </a>

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { saveWorkspaceWhiteboardAction } from "@/lib/actions/whiteboard"
+import { saveBoardWhiteboardAction } from "@/lib/actions/whiteboard"
 import type { WhiteboardData, WhiteboardEdge, WhiteboardNode } from "@/lib/queries/whiteboard"
 import { cn } from "@/lib/utils"
 
@@ -191,12 +191,14 @@ function ToolButton({
 }
 
 export function WhiteboardCanvas({
-  workspaceId,
-  workspaceSlug,
+  boardId,
+  boardName,
+  backHref,
   initialData,
 }: {
-  workspaceId: string
-  workspaceSlug: string
+  boardId: string
+  boardName: string
+  backHref: string
   initialData: WhiteboardData
 }) {
   const [nodes, setNodes] = useState<WhiteboardNode[]>(initialData.nodes)
@@ -231,11 +233,11 @@ export function WhiteboardCanvas({
 
   const persist = useCallback(
     (nextNodes: WhiteboardNode[], nextEdges: WhiteboardEdge[]) => {
-      saveWorkspaceWhiteboardAction(workspaceId, { nodes: nextNodes, edges: nextEdges }).catch((err) => {
+      saveBoardWhiteboardAction(boardId, { nodes: nextNodes, edges: nextEdges }).catch((err) => {
         toast.error(err instanceof Error ? err.message : "Errore nel salvataggio della lavagna")
       })
     },
-    [workspaceId]
+    [boardId]
   )
 
   const zoomIn = useCallback(() => setZoom((z) => Math.min(ZOOM_MAX, +(z + 0.1).toFixed(2))), [])
@@ -512,13 +514,15 @@ export function WhiteboardCanvas({
     <div className="flex h-full flex-col">
       <div className="flex flex-shrink-0 flex-wrap items-center gap-2 overflow-x-auto border-b border-border bg-white px-3.5 py-2">
         <Link
-          href={`/w/${workspaceSlug}`}
-          aria-label="Torna al workspace"
+          href={backHref}
+          aria-label="Torna alla board"
           className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#f7f7f7]"
         >
           <BackIcon />
         </Link>
-        <div className="shrink-0 font-heading text-sm font-extrabold whitespace-nowrap text-foreground">Lavagna</div>
+        <div className="shrink-0 font-heading text-sm font-extrabold whitespace-nowrap text-foreground">
+          Lavagna <span className="font-medium text-ink-faint">· {boardName}</span>
+        </div>
         <div className="h-[22px] w-px shrink-0 bg-border" />
 
         <div className="flex shrink-0 items-center gap-[3px]">

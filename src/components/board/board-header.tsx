@@ -39,6 +39,21 @@ export function BoardHeader({
     </Link>
   )
 
+  const whiteboardButton = (
+    <Link
+      href={`/w/${workspaceSlug}/b/${board.id}/whiteboard`}
+      aria-label="Lavagna progetto"
+      title="Lavagna progetto"
+      className="flex size-[34px] shrink-0 items-center justify-center rounded-[9px] bg-white/[0.22] md:size-9"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="8.5" cy="8.5" r="6" fill="#7d5cf0" />
+        <circle cx="15" cy="9.5" r="5.2" fill="#22c1a3" opacity="0.9" />
+        <circle cx="11.5" cy="16" r="5.6" fill="#ff5c8a" opacity="0.9" />
+      </svg>
+    </Link>
+  )
+
   const editButton = canEdit && (
     <EditBoardSheet
       board={board}
@@ -69,7 +84,10 @@ export function BoardHeader({
       <div className="md:hidden">
         <div className="flex items-center justify-between">
           {backButton}
-          <div className="flex gap-2">{editButton}</div>
+          <div className="flex gap-2">
+            {whiteboardButton}
+            {editButton}
+          </div>
         </div>
         <div className="mt-3.5 min-w-0">
           <div className="truncate font-heading text-xl font-extrabold text-white [text-shadow:0_1px_6px_rgb(0_0_0_/_0.2)]">
@@ -89,7 +107,10 @@ export function BoardHeader({
           <div className="mt-0.5 truncate text-xs text-white/85">{workspaceName}</div>
         </div>
       </div>
-      <div className="hidden md:block">{editButton}</div>
+      <div className="hidden items-center gap-2 md:flex">
+        {whiteboardButton}
+        {editButton}
+      </div>
     </div>
   )
 }

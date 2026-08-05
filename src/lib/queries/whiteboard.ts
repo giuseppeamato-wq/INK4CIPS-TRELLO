@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { getDb } from "@/db"
-import { workspaceWhiteboards } from "@/db/schema"
-import { requireWorkspaceMember } from "@/lib/authz/guards"
+import { boardWhiteboards } from "@/db/schema"
+import { requireBoardMember } from "@/lib/authz/guards"
 
 export type WhiteboardNode = {
   id: string
@@ -26,7 +26,7 @@ export type WhiteboardData = {
   edges: WhiteboardEdge[]
 }
 
-// First-ever open of a workspace's whiteboard isn't blank — same seed as the
+// First-ever open of a board's whiteboard isn't blank — same seed as the
 // design prototype (two connected example nodes) so the empty state doesn't
 // look broken.
 function seedWhiteboardData(): WhiteboardData {
@@ -39,17 +39,14 @@ function seedWhiteboardData(): WhiteboardData {
   }
 }
 
-export async function getWorkspaceWhiteboard(
-  workspaceId: string,
-  requestingUserId: string
-): Promise<WhiteboardData> {
-  await requireWorkspaceMember(workspaceId, requestingUserId)
+export async function getBoardWhiteboard(boardId: string, requestingUserId: string): Promise<WhiteboardData> {
+  await requireBoardMember(boardId, requestingUserId)
 
   const db = getDb()
   const [row] = await db
-    .select({ data: workspaceWhiteboards.data })
-    .from(workspaceWhiteboards)
-    .where(eq(workspaceWhiteboards.workspaceId, workspaceId))
+    .select({ data: boardWhiteboards.data })
+    .from(boardWhiteboards)
+    .where(eq(boardWhiteboards.boardId, boardId))
 
   if (!row) return seedWhiteboardData()
 

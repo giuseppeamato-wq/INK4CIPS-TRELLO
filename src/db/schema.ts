@@ -292,15 +292,15 @@ export const notifications = sqliteTable(
   (t) => [index("notifications_user_id_created_at_idx").on(t.userId, t.createdAt)]
 )
 
-// One shared freeform canvas per workspace (shapes + arrows), not realtime —
+// One shared freeform canvas per board (shapes + arrows), not realtime —
 // members autosave their edits and others pick them up on next load. Stored
 // as a single JSON blob (not normalized node/edge tables) since node shape
 // determines which fields matter (rect/pill/circle/text/sticky) and the
 // whole canvas is always read/written together.
-export const workspaceWhiteboards = sqliteTable("workspace_whiteboards", {
-  workspaceId: text("workspace_id")
+export const boardWhiteboards = sqliteTable("board_whiteboards", {
+  boardId: text("board_id")
     .primaryKey()
-    .references(() => workspaces.id, { onDelete: "cascade" }),
+    .references(() => boards.id, { onDelete: "cascade" }),
   data: text("data").notNull().default('{"nodes":[],"edges":[]}'),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 })
