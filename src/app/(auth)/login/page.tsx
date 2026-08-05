@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -24,8 +24,16 @@ const loginSchema = z.object({
   password: z.string().min(1, "Inserisci la password"),
 })
 
-export default function LoginPage() {
+// Only ever follow a same-site path (e.g. an invite link) — never let the
+// query string redirect somewhere off-app.
+function safeNext(raw: string | null): string {
+  if (raw && raw.startsWith("/") && !raw.startsWith("//")) return raw
+  return "/"
+}
+
+function LoginForm() {
   const router = useRouter()
+  const next = safeNext(useSearchParams().get("next"))
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -45,7 +53,7 @@ export default function LoginPage() {
       return
     }
 
-    router.replace("/")
+    router.replace(next)
     router.refresh()
   }
 
@@ -102,12 +110,23 @@ export default function LoginPage() {
           </Button>
           <p className="mt-1 text-center text-[13px] text-muted-foreground">
             Non hai un account?{" "}
-            <Link href="/signup" className="font-semibold text-foreground no-underline">
+            <Link
+              href={next === "/" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
+              className="font-semibold text-foreground no-underline"
+            >
               Registrati
             </Link>
           </p>
         </form>
       </Form>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   )
 }

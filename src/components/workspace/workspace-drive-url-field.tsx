@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { updateWorkspaceDriveUrlAction } from "@/lib/actions/workspaces"
 
 export function WorkspaceDriveUrlField({
@@ -33,15 +31,20 @@ export function WorkspaceDriveUrlField({
 
   return (
     <div className="flex gap-2">
-      <Input
+      <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="https://drive.google.com/drive/folders/..."
-        className="max-w-md"
+        className="h-11 w-full min-w-0 rounded-[10px] border border-[#e5e5e5] bg-[#fafafa] px-3.5 text-[13.5px] outline-none"
       />
-      <Button size="sm" onClick={save} disabled={isSaving}>
-        Salva
-      </Button>
+      <button
+        type="button"
+        onClick={save}
+        disabled={isSaving}
+        className="h-11 shrink-0 rounded-[10px] bg-[#1a1a1a] px-4 text-[13.5px] font-semibold text-white disabled:opacity-50"
+      >
+        {isSaving ? "Salvataggio..." : "Salva"}
+      </button>
     </div>
   )
 }

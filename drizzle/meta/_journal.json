@@ -71,6 +71,20 @@
       "when": 1785928602113,
       "tag": "0009_slippery_the_hood",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1785940426394,
+      "tag": "0010_steep_gabe_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1785940440060,
+      "tag": "0011_backfill_invite_tokens",
+      "breakpoints": true
     }
   ]
 }

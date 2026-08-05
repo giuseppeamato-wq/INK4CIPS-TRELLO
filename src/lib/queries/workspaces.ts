@@ -118,9 +118,30 @@ export async function getPendingInvites(workspaceId: string, requestingUserId: s
       id: workspaceInvites.id,
       email: workspaceInvites.email,
       role: workspaceInvites.role,
+      token: workspaceInvites.token,
       createdAt: workspaceInvites.createdAt,
     })
     .from(workspaceInvites)
     .where(and(eq(workspaceInvites.workspaceId, workspaceId), eq(workspaceInvites.status, "pending")))
     .orderBy(desc(workspaceInvites.createdAt))
+}
+
+// Public lookup for the /invite/[token] landing page — no membership guard,
+// since the whole point is that someone without an account yet can open it.
+export async function getInviteByToken(token: string) {
+  const db = getDb()
+  const [invite] = await db
+    .select({
+      id: workspaceInvites.id,
+      role: workspaceInvites.role,
+      status: workspaceInvites.status,
+      workspaceId: workspaces.id,
+      workspaceName: workspaces.name,
+      workspaceSlug: workspaces.slug,
+    })
+    .from(workspaceInvites)
+    .innerJoin(workspaces, eq(workspaces.id, workspaceInvites.workspaceId))
+    .where(eq(workspaceInvites.token, token))
+
+  return invite ?? null
 }

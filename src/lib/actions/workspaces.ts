@@ -6,6 +6,7 @@ import { user as userTable, workspaceInvites, workspaceMembers, workspaces } fro
 import { requireSession } from "@/lib/auth/session"
 import { ForbiddenError, requireWorkspaceAdmin, requireWorkspaceOwner } from "@/lib/authz/guards"
 import { reconcilePendingInvites } from "@/lib/invites"
+import { createNotification } from "@/lib/notifications/create"
 import { slugify } from "@/lib/slug"
 
 export async function createWorkspaceAction(name: string) {
@@ -35,7 +36,12 @@ export async function createInviteAction(
   const [invite] = await db
     .insert(workspaceInvites)
     .values({ workspaceId, email, role, invitedBy: session.user.id })
-    .returning({ id: workspaceInvites.id, email: workspaceInvites.email, role: workspaceInvites.role })
+    .returning({
+      id: workspaceInvites.id,
+      email: workspaceInvites.email,
+      role: workspaceInvites.role,
+      token: workspaceInvites.token,
+    })
 
   // If the invited email already belongs to an account, don't make them
   // wait for their next login to see the workspace — an already-signed-in
@@ -51,6 +57,49 @@ export async function createInviteAction(
   }
 
   return invite
+}
+
+export async function acceptInviteByTokenAction(token: string) {
+  const session = await requireSession()
+  const db = getDb()
+
+  const [invite] = await db
+    .select({
+      id: workspaceInvites.id,
+      workspaceId: workspaceInvites.workspaceId,
+      role: workspaceInvites.role,
+      status: workspaceInvites.status,
+      workspaceName: workspaces.name,
+      workspaceSlug: workspaces.slug,
+    })
+    .from(workspaceInvites)
+    .innerJoin(workspaces, eq(workspaces.id, workspaceInvites.workspaceId))
+    .where(eq(workspaceInvites.token, token))
+
+  if (!invite || invite.status !== "pending") {
+    throw new Error("Invito non valido o già usato")
+  }
+
+  await db.batch([
+    db
+      .insert(workspaceMembers)
+      .values({ workspaceId: invite.workspaceId, userId: session.user.id, role: invite.role })
+      .onConflictDoNothing(),
+    db.update(workspaceInvites).set({ status: "accepted" }).where(eq(workspaceInvites.id, invite.id)),
+  ])
+
+  try {
+    await createNotification({
+      userId: session.user.id,
+      type: "workspace_invite",
+      message: `Sei stato aggiunto al workspace "${invite.workspaceName}"`,
+      url: `/w/${invite.workspaceSlug}`,
+    })
+  } catch {
+    // Best-effort — a notification failure shouldn't undo the join above.
+  }
+
+  return { workspaceSlug: invite.workspaceSlug }
 }
 
 export async function updateMemberRoleAction(

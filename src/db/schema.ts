@@ -101,6 +101,12 @@ export const workspaceInvites = sqliteTable(
     role: text("role", { enum: inviteRoleValues }).notNull().default("member"),
     invitedBy: text("invited_by").notNull().references(() => user.id),
     status: text("status", { enum: inviteStatusValues }).notNull().default("pending"),
+    // Shareable-link identifier for this invite. Nullable at the DB level
+    // only so the ADD COLUMN migration doesn't need a literal default that
+    // would collide with the unique index on existing rows — every new
+    // insert still gets one via $defaultFn, and pre-existing rows are
+    // backfilled by a follow-up migration.
+    token: text("token").unique().$defaultFn(() => crypto.randomUUID()),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
   },
   (t) => [index("workspace_invites_email_status_idx").on(t.email, t.status)]
